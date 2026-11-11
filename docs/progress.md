@@ -36,7 +36,5 @@ Screenshots: `docs/phase1-evidence/`.
 - The AI has no way to answer questions yet (Phase 3).
 
 ## What I need from you
-1. **GitHub access.** Your account is not linked to Claude yet, so I can't upload to
-   `EdwardRichtofen0115/preptypeshit`. Open https://claude.ai/connect-github, connect GitHub,
-   allow the Claude app on that repository, then tell me. Everything is committed and waiting.
+1. ~~GitHub access~~ done: the project is saved at https://github.com/Ncascio1/offlinelibllama (branch `main`).
 2. Permission to download your 3B model (2 GB) here, to test real answers in Phase 3.
