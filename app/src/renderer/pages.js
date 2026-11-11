@@ -83,17 +83,6 @@ const PAGES = {
     ];
   },
 
-  ask(s) {
-    const q = params.get('q') || '';
-    return [
-      h('h1', {}, 'Ask'),
-      aiNotice(s),
-      askBox(s, q),
-      q ? h('div', { class: 'notice warn', style: 'margin-top:24px' },
-        'Answering questions is still being built. In the finished app your answer and its sources appear here.') : null,
-    ];
-  },
-
   message() {
     const M = {
       'shutting-down': ['Shutting down', 'Closing the library and the AI. This window closes by itself in a moment.'],

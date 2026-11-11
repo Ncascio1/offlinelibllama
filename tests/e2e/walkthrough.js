@@ -118,9 +118,11 @@ async function waitFor(fn, ms = 30000, step = 200) {
   await content.waitForURL(/home\.html/);
   await content.fill('#question', 'How do I tie a bowline?');
   await content.click('.ask button');
-  await content.waitForURL(/ask\.html\?q=/);
-  await content.screenshot({ path: path.join(OUT, '07-ask-placeholder.png') });
-  check('Ask box carries the question to the Ask page', decodeURIComponent(content.url()).includes('bowline'));
+  await content.waitForURL(/ask\.html/);
+  const asked = await waitFor(() => content.evaluate(() => window.ol.askGet().then(d => d.turns[0] && d.turns[0].question)), 5000);
+  check('Home Ask box opens Ask and starts answering', asked === 'How do I tie a bowline?', asked || '');
+  await waitFor(() => content.evaluate(() => window.ol.askGet().then(d => !d.busy)), 120000);
+  await content.screenshot({ path: path.join(OUT, '07-ask-tiny-model.png') });
 
   // Book pages must not reach the app's controls, and the internet must be blocked
   await bar.click('button[data-cmd=library]');

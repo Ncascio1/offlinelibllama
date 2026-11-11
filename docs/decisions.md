@@ -133,3 +133,39 @@ the "OSM - " prefix removed ("Bahrain").
   advice, but in short: ship a copy of the licence, show "Built with Llama"
   prominently (Help page and About), keep Meta's copyright notice, and pass on
   Meta's Acceptable Use Policy. The 700-million-user limit does not affect you.
+
+---
+
+## D9. How "Ask the AI" works (Phase 3)
+
+Each question goes through these steps (code in `app/src/main/ask/`):
+
+1. **Search words.** The AI suggests 2 to 4 keywords. Its suggestions are kept only
+   if they appear in the question (one genuinely new word allowed), because the
+   3B model sometimes slipped guessed answers into its keywords ("Georgia, 1930").
+   If the AI fails, filler words are removed from the question instead.
+2. **Search.** Every text book is searched (maps never). Kiwix needs every word to
+   match, so we try all keywords, then the question's own words, then fewer words,
+   plus title matches; results are merged. Up to 10 articles are read.
+3. **Passages.** Articles are cleaned (no menus, references, links) and cut into
+   ~130-word passages, ranked by BM25 plus how well their article matched. The
+   opening summary of the best articles gets a small bonus (key facts live
+   there), and for "how do I..." questions, sections like *Tying*, *Method*,
+   *Treatment* get a bonus.
+4. **Budget.** Passages are added best-first up to a cap (1,500 tokens on the
+   small tier, 3,200 on bigger tiers), then the exact size is checked with the
+   AI's own counter. The prompt can never overflow the AI's memory window.
+   The cap also limits the wait before the first word on slow PCs.
+5. **Answer.** Streamed word by word, low "creativity" (temperature 0.1). Earlier
+   conversation is only included for follow-up questions ("what did *he* play?").
+6. **After the answer.** Citation numbers that point at the wrong source are
+   corrected; only cited sources are listed; and a word check compares the
+   answer with the passages. If much of it can't be found there, the customer
+   sees: "Parts of this answer may not come from the library."
+
+**Privacy.** Questions and keywords are never written to the log; only counts and timings.
+
+**Why the checks exist.** In testing, the 3B model sometimes filled gaps with its
+own knowledge (it invented bowline-tying steps when the right passage was
+missing) and numbered citations wrongly. Better retrieval fixed the bowline case;
+the checks are a safety net for the cases retrieval can't fix.

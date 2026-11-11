@@ -9,5 +9,11 @@ if (location.protocol === 'app:' && location.host === 'local') {
     getState: () => ipcRenderer.invoke('get-state'),
     onState: fn => { ipcRenderer.on('state', (_e, s) => fn(s)); },
     command: (name, arg) => ipcRenderer.send('command', name, arg),
+    // Ask the AI
+    askGet: () => ipcRenderer.invoke('ask-get'),
+    ask: question => ipcRenderer.send('ask', question),
+    askStop: () => ipcRenderer.send('ask-stop'),
+    askReset: () => ipcRenderer.send('ask-reset'),
+    onAsk: fn => { ipcRenderer.on('ask-update', (_e, data) => fn(data)); },
   });
 }

@@ -25,6 +25,8 @@ const { AiService } = require('./ai-service');
 const { writePidsFile, removePidsFile, cleanStaleEngines } = require('./processes');
 const { createMainWindow } = require('./window');
 const { registerAppProtocol, APP_PARTITIONS } = require('./app-protocol');
+const { AskService } = require('./ask/ask-service');
+const { KiwixRetriever } = require('./ask/kiwix-retriever');
 
 const START_TIME = Date.now();
 const RENDERER_DIR = path.join(__dirname, '..', 'renderer');
@@ -79,7 +81,29 @@ let ui = null;          // { win, bar, content }
 let kiwix = null;       // KiwixService
 let ai = null;          // AiService
 let shuttingDown = false;
+let retriever = null;   // searches the books for the AI (set once the library is ready)
 const pidsFile = path.join(dirs.data, 'pids.json');
+
+// "Ask the AI": the conversation lives here, so it survives leaving the Ask page.
+const askService = new AskService({
+  getAi: () => (ai ? ai.connection() : null),
+  getRetriever: () => (state.library.state === 'ready' ? retriever : null),
+  log,
+  onChange: () => sendAskUpdate(),
+});
+
+// Send the conversation to the Ask page (if it is showing). Answers arrive word by
+// word, so updates are bundled to at most ~12 per second.
+let askUpdateTimer = null;
+function sendAskUpdate() {
+  if (askUpdateTimer) return;
+  askUpdateTimer = setTimeout(() => {
+    askUpdateTimer = null;
+    if (!ui) return;
+    const wc = ui.content.webContents;
+    if (!wc.isDestroyed() && wc.getURL().startsWith('app://local/ask')) wc.send('ask-update', { turns: askService.snapshot(), busy: askService.busy });
+  }, 80);
+}
 
 function broadcast() {
   if (!ui) return;
@@ -125,7 +149,18 @@ function handleCommand(name, arg) {
     case 'forward': return h.canGoForward() && h.goForward();
     case 'library': return go('app://local/library.html');
     case 'maps': return go('app://local/maps.html');
-    case 'ask': return go('app://local/ask.html' + (typeof arg === 'string' && arg ? '?q=' + encodeURIComponent(arg.slice(0, 2000)) : ''));
+    case 'ask': {
+      // From the Home page box: open the Ask page and start answering straight away.
+      if (typeof arg === 'string' && arg.trim()) askService.ask(arg);
+      return go('app://local/ask.html');
+    }
+    case 'open-source': {
+      // A numbered source under an answer: open that article in the reader.
+      const link = arg && askService.sourceLink(Number(arg.turnId), Number(arg.n));
+      const m = link && kiwix && link.match(/^\/content\/([^/]+)\/(.+)$/);
+      if (!m) return;
+      return go(`${kiwix.baseUrl}/viewer#${m[1]}/${m[2]}`);
+    }
     case 'help': return go(paths && fs.existsSync(paths.startHere) ? 'app://drive/START-HERE.html' : 'app://local/message.html?kind=no-help');
     case 'open-book': {
       const book = kiwix && kiwix.books.find(b => b.slug === arg);
@@ -140,6 +175,10 @@ function handleCommand(name, arg) {
 }
 
 ipcMain.handle('get-state', e => (isOurPage(e) ? state : null));
+ipcMain.handle('ask-get', e => (isOurPage(e) ? { turns: askService.snapshot(), busy: askService.busy } : null));
+ipcMain.on('ask', (e, q) => { if (isOurPage(e) && typeof q === 'string') askService.ask(q); });
+ipcMain.on('ask-stop', e => { if (isOurPage(e)) askService.stop(); });
+ipcMain.on('ask-reset', e => { if (isOurPage(e)) askService.reset(); });
 ipcMain.on('command', (e, name, arg) => { if (isOurPage(e)) handleCommand(String(name), arg); });
 // Only our own pages may send commands (never a book page).
 function isOurPage(e) {
@@ -173,6 +212,7 @@ async function startEngines() {
     const books = await kiwix.start();
     savePids();
     state.library = { state: 'ready', message: '', books: publicBooks(books) };
+    retriever = new KiwixRetriever({ baseUrl: kiwix.baseUrl, books, log });
     log.info(`library ready after ${Date.now() - START_TIME} ms`);
     broadcast();
     kiwix.engine.onceExit(info => {
@@ -196,6 +236,7 @@ async function shutdown(reason) {
   if (shuttingDown) return;
   shuttingDown = true;
   log.info('shutting down:', reason);
+  askService.stop();
   if (ui && !ui.content.webContents.isDestroyed()) ui.content.webContents.loadURL('app://local/message.html?kind=shutting-down');
   await Promise.all([kiwix && kiwix.stop(), ai && ai.stop()]);
   removePidsFile(pidsFile);

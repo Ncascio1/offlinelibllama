@@ -2,11 +2,28 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Offline Library</title>
+<title>Ask</title>
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="ask.css">
 </head>
-<body data-page="ask">
-<main id="main"></main>
-<script src="pages.js"></script>
+<body>
+<main>
+  <h1>Ask</h1>
+  <div id="ai-notice" class="notice warn" role="status" hidden></div>
+  <p id="empty">Ask a question in your own words. The AI searches the books on this drive and answers from what it finds, with numbered sources you can open.</p>
+  <div id="turns"></div>
+
+  <form class="ask" id="ask-form">
+    <label for="question">Your question</label>
+    <div class="row">
+      <textarea id="question" rows="2" placeholder="For example: how do I purify water?" aria-describedby="ask-note"></textarea>
+      <button type="button" id="send">Ask</button>
+      <button type="button" id="stop" class="stop" hidden>Stop</button>
+    </div>
+    <p class="small" id="ask-note">The AI answers from the books on this drive and can still make mistakes. Check the sources it shows.</p>
+    <button type="button" id="reset" class="secondary" hidden>New question</button>
+  </form>
+</main>
+<script src="ask.js"></script>
 </body>
 </html>
