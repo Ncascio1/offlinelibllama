@@ -27,6 +27,7 @@ const { createMainWindow } = require('./window');
 const { registerAppProtocol, APP_PARTITIONS } = require('./app-protocol');
 const { AskService } = require('./ask/ask-service');
 const { KiwixRetriever } = require('./ask/kiwix-retriever');
+const { searchLibrary } = require('./library-search');
 
 const START_TIME = Date.now();
 const RENDERER_DIR = path.join(__dirname, '..', 'renderer');
@@ -120,7 +121,7 @@ function publicBooks(books) {
 // Which top-bar section is the content area showing?
 function sectionFor(url) {
   if (url.startsWith('app://local/home')) return 'home';
-  if (url.startsWith('app://local/library')) return 'library';
+  if (url.startsWith('app://local/library') || url.startsWith('app://local/search')) return 'library';
   if (url.startsWith('app://local/maps')) return 'maps';
   if (url.startsWith('app://local/ask')) return 'ask';
   if (url.startsWith('app://drive/') || url.startsWith('app://local/help')) return 'help';
@@ -132,8 +133,38 @@ function sectionFor(url) {
   return '';
 }
 
+// A short message in the top bar (internet links, map loading).
+function showNotice(n) {
+  if (ui && !ui.bar.webContents.isDestroyed()) ui.bar.webContents.send('notice', n);
+}
+
+// Maps can take a while to appear from a slow drive: say so until the map is drawn.
+let mapWatch = 0;
+async function watchMapLoading(url) {
+  const id = ++mapWatch;
+  const wc = ui.content.webContents;
+  showNotice({ text: 'Loading the map…', kind: 'info', ms: 0 });
+  const started = Date.now();
+  let warned = false;
+  while (id === mapWatch && !wc.isDestroyed() && wc.getURL() === url) {
+    const drawn = await wc.executeJavaScript('!!(window.__streetzim_map && window.__streetzim_map.loaded && window.__streetzim_map.loaded())', true).catch(() => false);
+    if (drawn) { log.info(`map drawn after ${Date.now() - started} ms`); return showNotice({ text: '', ms: 0 }); }
+    if (!warned && Date.now() - started > 60000) {
+      warned = true;
+      log.warn('map not drawn after 60 s');
+      showNotice({ text: 'The map is taking a long time to open. On some older computers maps do not work.', kind: 'warn', ms: 0 });
+    }
+    await new Promise(r => setTimeout(r, 300));
+  }
+  if (id === mapWatch) showNotice({ text: '', ms: 0 }); // moved away: clear the message
+}
+
 function onNavChanged() {
   const wc = ui.content.webContents;
+  const url = wc.getURL();
+  if (kiwix && url.startsWith(kiwix.baseUrl + '/content/') && sectionFor(url) === 'maps') {
+    if (url !== onNavChanged.lastMapUrl) { onNavChanged.lastMapUrl = url; watchMapLoading(url); }
+  } else if (onNavChanged.lastMapUrl) { onNavChanged.lastMapUrl = null; mapWatch++; showNotice({ text: '', ms: 0 }); }
   state.nav = { canGoBack: wc.navigationHistory.canGoBack(), canGoForward: wc.navigationHistory.canGoForward(), section: sectionFor(wc.getURL()) };
   broadcast();
 }
@@ -153,6 +184,16 @@ function handleCommand(name, arg) {
       // From the Home page box: open the Ask page and start answering straight away.
       if (typeof arg === 'string' && arg.trim()) askService.ask(arg);
       return go('app://local/ask.html');
+    }
+    case 'search': {
+      const q = typeof arg === 'string' ? arg.trim().slice(0, 200) : '';
+      return go('app://local/search.html' + (q ? '?q=' + encodeURIComponent(q) : ''));
+    }
+    case 'open-article': {
+      // A search result: only articles in books we know, opened in the reader.
+      const book = kiwix && arg && kiwix.books.find(b => b.slug === arg.slug && !b.isMap);
+      if (!book || typeof arg.path !== 'string' || !arg.path || arg.path.length > 1000) return;
+      return go(`${kiwix.baseUrl}/viewer#${encodeURIComponent(book.slug)}/${arg.path.split('/').map(encodeURIComponent).join('/')}`);
     }
     case 'open-source': {
       // A numbered source under an answer: open that article in the reader.
@@ -175,6 +216,11 @@ function handleCommand(name, arg) {
 }
 
 ipcMain.handle('get-state', e => (isOurPage(e) ? state : null));
+ipcMain.handle('search-library', async (e, q) => {
+  if (!isOurPage(e) || state.library.state !== 'ready') return null;
+  try { return await searchLibrary({ baseUrl: kiwix.baseUrl, books: kiwix.books, query: q }); }
+  catch (err) { log.warn('library search failed:', err.message); return { error: true, titleMatches: [], results: [], total: 0 }; }
+});
 ipcMain.handle('ask-get', e => (isOurPage(e) ? { turns: askService.snapshot(), busy: askService.busy } : null));
 ipcMain.on('ask', (e, q) => { if (isOurPage(e) && typeof q === 'string') askService.ask(q); });
 ipcMain.on('ask-stop', e => { if (isOurPage(e)) askService.stop(); });
@@ -263,7 +309,7 @@ app.whenReady().then(() => {
 
   ui = createMainWindow({
     preload: path.join(__dirname, '..', 'preload', 'preload.js'),
-    isPackaged: app.isPackaged, log, onNavChanged,
+    isPackaged: app.isPackaged, log, onNavChanged, onNotice: showNotice,
     onClose: () => { if (!shuttingDown) { shutdown('window closed'); return false; } return true; },
   });
   ui.bar.webContents.loadURL('app://local/bar.html');

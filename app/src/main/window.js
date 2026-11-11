@@ -29,7 +29,15 @@ function lockDownSession(ses, log) {
 
 function safeHost(url) { try { return new URL(url).host || url.slice(0, 40); } catch { return url.slice(0, 40); } }
 
-function createMainWindow({ preload, isPackaged, log, onClose, onNavChanged }) {
+// Is this Kiwix's "External Link Detected" page (shown for internet links in books)?
+function isKiwixExternalCatch(url) {
+  try { const u = new URL(url); return u.hostname === '127.0.0.1' && u.pathname.endsWith('/catch/external'); } catch { return false; }
+}
+
+const INTERNET_LINK_MESSAGE = 'That link needs the internet, so it can\'t open here.';
+
+function createMainWindow({ preload, isPackaged, log, onClose, onNavChanged, onNotice }) {
+  const notice = (text, kind = 'info', ms = 6000) => { if (onNotice) onNotice({ text, kind, ms }); };
   const win = new BaseWindow({
     width: 1200, height: 820, minWidth: 640, minHeight: 480,
     title: 'Offline Library', backgroundColor: '#e8ece9', show: false,
@@ -61,11 +69,18 @@ function createMainWindow({ preload, isPackaged, log, onClose, onNavChanged }) {
   for (const wc of [bar.webContents, content.webContents]) {
     wc.setWindowOpenHandler(({ url }) => {
       // "Open in new tab" style links from books: open them in the content area instead.
-      if (isAllowedUrl(url) && !url.startsWith('blob:')) content.webContents.loadURL(url);
-      else log.warn('blocked new window to', safeHost(url));
+      if (isAllowedUrl(url) && !url.startsWith('blob:') && !isKiwixExternalCatch(url)) content.webContents.loadURL(url);
+      else { log.warn('blocked new window to', safeHost(url)); notice(INTERNET_LINK_MESSAGE); }
       return { action: 'deny' };
     });
-    wc.on('will-navigate', (e, url) => { if (!isAllowedUrl(url)) { e.preventDefault(); log.warn('blocked link to', safeHost(url)); } });
+    // Any frame (including the article inside Kiwix's reader) trying to go to the internet.
+    wc.on('will-frame-navigate', e => {
+      if (!isAllowedUrl(e.url) || isKiwixExternalCatch(e.url)) {
+        e.preventDefault();
+        log.warn('blocked link to', isKiwixExternalCatch(e.url) ? 'an internet address (via Kiwix)' : safeHost(e.url));
+        notice(INTERNET_LINK_MESSAGE);
+      }
+    });
     wc.on('will-attach-webview', e => e.preventDefault());
     wc.on('before-input-event', (e, input) => { if (handleKeys(input, content, isPackaged)) e.preventDefault(); });
   }

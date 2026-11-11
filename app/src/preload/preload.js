@@ -9,6 +9,8 @@ if (location.protocol === 'app:' && location.host === 'local') {
     getState: () => ipcRenderer.invoke('get-state'),
     onState: fn => { ipcRenderer.on('state', (_e, s) => fn(s)); },
     command: (name, arg) => ipcRenderer.send('command', name, arg),
+    onNotice: fn => { ipcRenderer.on('notice', (_e, n) => fn(n)); },
+    searchLibrary: q => ipcRenderer.invoke('search-library', q),
     // Ask the AI
     askGet: () => ipcRenderer.invoke('ask-get'),
     ask: question => ipcRenderer.send('ask', question),

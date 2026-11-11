@@ -20,3 +20,10 @@ nav button.shutdown { color: #fff; background: var(--bad); border-color: var(--b
 .confirm button.secondary { color: var(--blue); border-color: var(--blue); }
 /* Narrow windows: hide the AI text, keep the coloured dot (tooltip still explains). */
 @media (max-width: 900px) { #ai-text { display: none; } }
+
+/* Short messages: "That link needs the internet...", "Loading the map..." */
+.grow { display: flex; justify-content: center; min-width: 0; }
+.bar-notice { background: var(--yellow); color: #14202b; font-weight: 600; font-size: 15px; padding: 6px 12px;
+  border-radius: 6px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-notice.info { background: #dbe7f2; }
+@media (prefers-color-scheme: dark) { .bar-notice.info { background: #2b3d4f; color: var(--ink); } }

@@ -64,7 +64,9 @@ const PAGES = {
       h('h1', {}, 'Library'),
       libraryNotice(s),
       s.library.state === 'ready' && books.length === 0 ? h('div', { class: 'notice warn' }, 'There are no books on this drive, only maps.') : null,
-      books.length ? h('p', {}, 'Choose a book. Inside a book, use the search box at the top to find a topic.') : null,
+      books.length ? searchBox() : null,
+      books.length ? h('h2', { style: 'margin-top:28px' }, 'Books') : null,
+      books.length ? h('p', {}, 'Or choose a book. Inside a book, the search box at the top searches that book only.') : null,
       h('div', { class: 'list' }, ...books.map(b =>
         h('button', { class: 'item', onclick: () => cmd('open-book', b.slug) }, h('strong', {}, b.title), b.summary ? h('span', {}, b.summary) : null))),
     ];
@@ -83,6 +85,18 @@ const PAGES = {
     ];
   },
 
+  search(s) {
+    const q = params.get('q') || '';
+    const box = searchBox();
+    box.querySelector('input').value = q;
+    const out = h('div', { id: 'results', role: 'status' }, q ? 'Searching…' : '');
+    if (q && s.library.state === 'ready' && !searchStarted) {
+      searchStarted = true;
+      window.ol.searchLibrary(q).then(r => showResults(r, q));
+    }
+    return [h('h1', {}, 'Search all books'), libraryNotice(s), box, lastResults || out];
+  },
+
   message() {
     const M = {
       'shutting-down': ['Shutting down', 'Closing the library and the AI. This window closes by itself in a moment.'],
@@ -96,6 +110,43 @@ const PAGES = {
   },
 };
 
+// "Search all books" box (Library page).
+function searchBox() {
+  const input = h('input', { type: 'text', id: 'search', placeholder: 'For example: water filter', 'aria-label': 'Search all books' });
+  const go = () => { if (input.value.trim()) cmd('search', input.value.trim()); };
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+  return h('div', { class: 'ask' },
+    h('label', { for: 'search' }, 'Search all books'),
+    h('div', { class: 'row' }, input, h('button', { type: 'button', onclick: go }, 'Search')));
+}
+
+let searchStarted = false;
+let lastResults = null;
+const FIRST_RESULTS = 15;
+function showResults(r, q) {
+  const result = item => h('li', {}, h('button', { class: 'result', onclick: () => cmd('open-article', { slug: item.slug, path: item.path }) },
+    h('strong', {}, item.title), h('span', { class: 'from' }, ` from ${item.bookTitle}`), item.snippet ? h('span', { class: 'snippet' }, item.snippet) : null));
+  let content;
+  if (!r || r.error) content = h('div', { class: 'notice bad' }, 'The search did not work this time. Try again in a moment.');
+  else if (!r.results.length && !r.titleMatches.length) content = h('div', { class: 'notice warn' }, `Nothing found for "${q}". Try fewer or different words.`);
+  else content = h('div', {},
+    r.titleMatches.length ? h('h2', {}, 'Articles with this name') : null,
+    r.titleMatches.length ? h('ul', { class: 'results' }, ...r.titleMatches.map(result)) : null,
+    r.results.length ? h('h2', {}, 'Articles that mention it') : null,
+    r.results.length ? h('ul', { class: 'results', id: 'mentions' }, ...r.results.slice(0, FIRST_RESULTS).map(result)) : null,
+    r.results.length > FIRST_RESULTS ? h('button', { class: 'secondary', id: 'more', onclick: e => {
+      // Show the rest, then put the keyboard focus on the first newly shown result.
+      const list = document.getElementById('mentions');
+      const extra = r.results.slice(FIRST_RESULTS).map(result);
+      list.append(...extra);
+      e.currentTarget.remove();
+      extra[0].querySelector('button').focus();
+    } }, `Show ${r.results.length - FIRST_RESULTS} more`) : null);
+  lastResults = h('div', { id: 'results' }, content);
+  const old = document.getElementById('results');
+  if (old) old.replaceWith(lastResults);
+}
+
 // Maps need WebGL; check once.
 let webgl = null;
 function hasWebgl() {
@@ -107,13 +158,18 @@ function hasWebgl() {
 
 function render(s) {
   if (!s) return;
-  // Keep what the person is typing when the page refreshes.
-  const typing = document.getElementById('question');
-  const draft = typing ? typing.value : null;
-  const hadFocus = typing && document.activeElement === typing;
+  // The page is rebuilt when the app's status changes (for example the AI becomes
+  // ready). Keep whatever the person is typing, and where the cursor is.
+  const drafts = {};
+  for (const el of main.querySelectorAll('input[id], textarea[id]')) drafts[el.id] = { value: el.value, start: el.selectionStart, end: el.selectionEnd };
+  const focused = document.activeElement && document.activeElement.id;
   main.replaceChildren(...PAGES[page](s).filter(Boolean));
-  const again = document.getElementById('question');
-  if (again && draft !== null) { again.value = draft; if (hadFocus) again.focus(); }
+  for (const [id, d] of Object.entries(drafts)) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    el.value = d.value;
+    if (id === focused) { el.focus(); try { el.setSelectionRange(d.start, d.end); } catch {} }
+  }
 }
 
 if (page === 'message') render({});

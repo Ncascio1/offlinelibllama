@@ -79,3 +79,15 @@ textarea, input[type=text] {
 }
 
 [hidden] { display: none !important; }
+
+/* Search results */
+.results { list-style: none; padding: 0; margin: 0 0 28px; display: grid; gap: 4px; max-width: 75ch; }
+button.result {
+  display: block; width: 100%; text-align: left; font: inherit; font-weight: 400; color: var(--ink);
+  background: transparent; border: 2px solid transparent; border-radius: 8px; padding: 10px 12px; min-height: 52px; cursor: pointer;
+}
+button.result:hover { background: var(--card); border-color: var(--line); }
+button.result strong { color: var(--blue); text-decoration: underline; font-size: 1.1rem; }
+button.result .from { color: var(--muted); }
+button.result .snippet { display: block; color: var(--muted); font-size: .95rem; margin-top: 2px; }
+.ask input[type=text] { flex: 1; }

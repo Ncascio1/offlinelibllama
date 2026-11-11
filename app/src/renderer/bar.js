@@ -26,5 +26,16 @@ function render(s) {
   ai.title = s.ai.message;
 }
 
+let noticeTimer = null;
+window.ol.onNotice(n => {
+  const el = $('notice');
+  clearTimeout(noticeTimer);
+  el.textContent = n.text || '';
+  el.title = n.text || '';
+  el.className = `bar-notice ${n.kind || 'info'}`;
+  el.hidden = !n.text;
+  if (n.text && n.ms) noticeTimer = setTimeout(() => { el.hidden = true; }, n.ms);
+});
+
 window.ol.onState(render);
 window.ol.getState().then(render);
