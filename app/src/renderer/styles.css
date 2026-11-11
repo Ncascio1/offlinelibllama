@@ -1,0 +1,81 @@
+/* Offline Library: shared look for all of the app's own pages.
+   Colours from the brief: paper, ink, blue, signal yellow. Light and dark follow Windows. */
+:root {
+  --paper: #e8ece9;
+  --ink: #14202b;
+  --blue: #1f4e79;
+  --yellow: #f2c230;
+  --card: #ffffff;
+  --muted: #4a5763;
+  --line: #c3cbc6;
+  --ok: #2e6b3a;
+  --warn: #8a5a00;
+  --bad: #9b2c2c;
+  --focus: #f2c230;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #12191f;
+    --ink: #e8ece9;
+    --blue: #8fbce6;
+    --card: #1c252d;
+    --muted: #a9b4bd;
+    --line: #34414c;
+    --ok: #7cc48a;
+    --warn: #f2c230;
+    --bad: #f19a9a;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--paper); color: var(--ink); }
+body { font: 18px/1.5 "Segoe UI", system-ui, sans-serif; }
+h1, h2, h3 { font-family: Bahnschrift, "Segoe UI", system-ui, sans-serif; font-weight: 600; line-height: 1.2; margin: 0 0 .5em; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.4rem; }
+p { margin: 0 0 1em; max-width: 60ch; }
+a { color: var(--blue); }
+
+/* Big, clear focus outline for keyboard users */
+:focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
+
+main { padding: 32px 40px 48px; max-width: 1000px; }
+
+button, .button {
+  font: inherit; font-weight: 600; color: #fff; background: var(--blue);
+  border: 2px solid var(--blue); border-radius: 8px; padding: 12px 22px; min-height: 52px; cursor: pointer;
+}
+button.secondary { background: transparent; color: var(--blue); }
+button:disabled { opacity: .5; cursor: not-allowed; }
+@media (prefers-color-scheme: dark) { button:not(.secondary) { color: #12191f; } }
+
+/* Big entries on the home page and lists */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 0 0 32px; }
+.tile, .item {
+  display: block; width: 100%; text-align: left; background: var(--card); color: var(--ink);
+  border: 2px solid var(--line); border-radius: 12px; padding: 20px 22px; min-height: 96px; cursor: pointer; font: inherit;
+}
+.tile { display: flex; flex-direction: column; justify-content: flex-start; }
+.tile:hover, .item:hover { border-color: var(--blue); }
+.tile strong, .item strong { display: block; font-family: Bahnschrift, "Segoe UI", sans-serif; font-size: 1.4rem; color: var(--blue); margin-bottom: 4px; }
+.tile span, .item span { color: var(--muted); font-weight: 400; }
+.list { display: grid; gap: 12px; margin: 0 0 24px; }
+
+/* Status and notices */
+.notice { border-left: 6px solid var(--blue); background: var(--card); padding: 14px 18px; border-radius: 6px; margin: 0 0 24px; max-width: 70ch; }
+.notice.warn { border-left-color: var(--yellow); }
+.notice.bad { border-left-color: var(--bad); }
+.small { font-size: .9rem; color: var(--muted); }
+
+/* Ask box */
+.ask { background: var(--card); border: 2px solid var(--line); border-radius: 12px; padding: 20px 22px; max-width: 70ch; }
+.ask label { display: block; font-family: Bahnschrift, "Segoe UI", sans-serif; font-size: 1.4rem; font-weight: 600; margin-bottom: 8px; }
+.ask .row { display: flex; gap: 12px; align-items: stretch; }
+textarea, input[type=text] {
+  font: inherit; color: var(--ink); background: var(--paper); border: 2px solid var(--line); border-radius: 8px;
+  padding: 10px 12px; width: 100%; min-height: 52px; resize: vertical;
+}
+
+[hidden] { display: none !important; }

@@ -1,0 +1,22 @@
+/* The top bar: always visible, 64 px high (matches BAR_HEIGHT in window.js). */
+html, body { height: 64px; overflow: hidden; }
+body { font-size: 16px; border-bottom: 3px solid var(--blue); background: var(--card); }
+nav { display: flex; align-items: center; gap: 6px; height: 61px; padding: 0 10px; white-space: nowrap; }
+nav button { min-height: 44px; padding: 6px 14px; background: transparent; color: var(--ink); border-color: transparent; }
+nav button:hover:not(:disabled) { border-color: var(--line); }
+nav button[aria-current="page"] { background: var(--blue); color: #fff; border-color: var(--blue); }
+@media (prefers-color-scheme: dark) { nav button[aria-current="page"] { color: #12191f; } }
+nav button.arrow { font-size: 18px; padding: 6px 12px; }
+nav button.shutdown { color: #fff; background: var(--bad); border-color: var(--bad); }
+@media (prefers-color-scheme: dark) { nav button.shutdown { color: #12191f; } }
+.sep { width: 1px; height: 32px; background: var(--line); margin: 0 6px; }
+.grow { flex: 1; }
+.ai { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 15px; padding: 0 8px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+.ai .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--line); flex: none; }
+.ai.starting .dot { background: var(--yellow); }
+.ai.ready .dot { background: var(--ok); }
+.ai.off .dot, .ai.failed .dot { background: var(--bad); }
+.confirm { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.confirm button.secondary { color: var(--blue); border-color: var(--blue); }
+/* Narrow windows: hide the AI text, keep the coloured dot (tooltip still explains). */
+@media (max-width: 900px) { #ai-text { display: none; } }

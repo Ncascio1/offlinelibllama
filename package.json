@@ -1,0 +1,10 @@
+{
+  "name": "offline-library-dev",
+  "private": true,
+  "description": "Development scripts for the Offline Library. Nothing here ships on the drive.",
+  "scripts": {
+    "test": "node --test tests/unit/*.test.js",
+    "e2e": "node tests/e2e/walkthrough.js",
+    "e2e:errors": "node tests/e2e/error-cases.js"
+  }
+}

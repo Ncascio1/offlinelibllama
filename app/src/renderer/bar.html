@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Offline Library</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="bar.css">
+</head>
+<body>
+<nav aria-label="Main">
+  <button id="home" data-cmd="home" title="Home">Home</button>
+  <button id="back" data-cmd="back" class="arrow" title="Back (Alt + Left arrow)" aria-label="Back">◀</button>
+  <button id="forward" data-cmd="forward" class="arrow" title="Forward (Alt + Right arrow)" aria-label="Forward">▶</button>
+  <span class="sep"></span>
+  <button data-cmd="library" data-section="library">Library</button>
+  <button data-cmd="maps" data-section="maps">Maps</button>
+  <button data-cmd="ask" data-section="ask">Ask</button>
+  <button data-cmd="help" data-section="help">Help</button>
+  <span class="grow"></span>
+  <span id="ai" class="ai" role="status" aria-live="polite"><span class="dot"></span><span id="ai-text">AI starting</span></span>
+  <button id="shutdown" class="shutdown">Shut down</button>
+  <span id="confirm" class="confirm" hidden>
+    <span>Shut down now?</span>
+    <button id="yes" class="shutdown">Yes</button>
+    <button id="no" class="secondary">No</button>
+  </span>
+</nav>
+<script src="bar.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "offline-library",
+  "productName": "Offline Library",
+  "version": "0.1.0",
+  "description": "Offline library, maps and AI assistant that runs from a USB drive.",
+  "private": true,
+  "main": "src/main/main.js",
+  "license": "UNLICENSED"
+}

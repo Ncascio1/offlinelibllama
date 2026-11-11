@@ -1,31 +1,42 @@
 # Progress
 
 ## Where we are
-Phase 0 (spikes) finished. Electron approved. Next: Phase 1, the app skeleton.
-Details: `docs/phase0-report.md`. Decisions: `docs/decisions.md`.
+- Phase 0 (spikes): done. See `docs/phase0-report.md`.
+- **Phase 1 (app skeleton): done and tested on Linux.** Not yet run on Windows.
+- Next: Phase 2 (polish of Library and Maps), then Phase 3 (Ask the AI), Phase 4 (Help, support info, guide), Phase 5 (build and drive scripts).
 
-## What works (tested here, on a Linux cloud computer)
-- Kiwix serves books, search and catalog; we know exactly which names it expects.
-- StreetZim maps open in the Electron window, even with no graphics card: search, zoom and pan all work, with no internet.
-- The AI engine (llama.cpp b12239) starts, reports "loading" then "ready", streams answers, stops when asked, and refuses anyone without the per-launch password.
-- One AI engine build handles old CPUs (tested with emulated 2008-era CPUs).
-- The Electron window blocks the internet at two levels, keeps its data on the drive, runs from a read-only drive, and allows only one copy.
-- Leftover engines from a crash are cleaned up safely at the next start.
+## What works now (tested here, on a Linux cloud computer)
+Screenshots: `docs/phase1-evidence/`.
+
+- One window with a top bar: Home, Back, Forward, Library, Maps, Ask, Help, an AI status light, and Shut down (asks "Shut down now?" first).
+- The home page appears in under half a second; the library is ready in about 0.7 s with the test books.
+- Library lists the books; a book opens inside the app with Kiwix's search box at the top.
+- Maps lists the maps by their friendly names ("Bahrain"); a map opens and works.
+- Back and Forward work across our pages, books and maps. Mouse side buttons and Alt+Left/Right also work.
+- Ctrl + plus / minus zooms, Ctrl + 0 resets, and the zoom stays when moving to another page.
+- Help opens START-HERE.html inside the app (the real guide comes in Phase 4).
+- The AI starts in the background; the light shows starting, ready, off or unavailable, with a plain explanation.
+- Plain messages for: no books, no AI files, not enough memory, the library stopping (for example a drive unplugged), the AI stopping.
+- Read-only drive: works.
+- Second double-click: no second copy.
+- Shut down or closing the window: Kiwix and the AI are stopped; nothing left running.
+- After a crash: leftovers are stopped at the next start (only our own engines).
+- Internet blocked at two levels; book pages cannot use the app's controls.
+- The Ask box takes a question to the Ask page; **answering is Phase 3**.
+
+## Tests
+- `npm test`: 40 unit tests (memory tiers incl. exactly 6/12/24 GB, Windows paths and drive letters,
+  Kiwix catalog and search parsing, network rule, ports, config file, crash cleanup, page-address guard, message wording).
+- `tests/e2e/walkthrough.js`: 25 to 26 checks clicking through the real app.
+- `tests/e2e/error-cases.js`: 13 checks for the failure situations above.
 
 ## Not tested yet
-- Nothing has run on Windows yet.
-- Dragging the map with a real mouse; map speed on a real old laptop.
-- Your Llama 3.2 3B model has not been run here (2 GB download). Its settings were read from the file header only.
-- If the app is force-closed on Linux, the AI engine is left running. On Windows this should not happen (Windows "job" feature), but it's not yet proven.
+- Nothing has run on Windows yet (no console window, Windows "job" cleanup, exFAT/NTFS, antivirus).
+- Your Llama 3.2 3B model has not been run (2 GB download). Settings read from the file header only.
+- The AI has no way to answer questions yet (Phase 3).
 
 ## What I need from you
-1. **A GitHub repository** so the work is saved off this temporary cloud computer (see below).
-2. Later: a Windows PC test of the first app build.
-3. The three Microsoft Visual C++ files (`msvcp140.dll`, `vcruntime140.dll`, `vcruntime140_1.dll`): I will explain how to get them when we build the drive.
-
-## Creating the GitHub repository (one-time, about 1 minute)
-1. Sign in at https://github.com and open https://github.com/new
-2. Repository name: `offline-library`. Choose **Private**. Leave every box unticked (no README, no licence).
-3. Click **Create repository**.
-4. Make sure Claude has access: open https://claude.ai/connect-github and, if asked, allow the Claude GitHub App on this repository.
-5. Tell me your GitHub user name. I will then upload all the work.
+1. **GitHub access.** Your account is not linked to Claude yet, so I can't upload to
+   `EdwardRichtofen0115/preptypeshit`. Open https://claude.ai/connect-github, connect GitHub,
+   allow the Claude app on that repository, then tell me. Everything is committed and waiting.
+2. Permission to download your 3B model (2 GB) here, to test real answers in Phase 3.
