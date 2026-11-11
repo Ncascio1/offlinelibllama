@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"
+      xmlns:dc="http://purl.org/dc/terms/"
+      xmlns:opds="https://specs.opds.io/opds-1.2"
+      xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">
+  <id>ac56b4d9-527b-430b-6cb1-d02bff02775c</id>
+
+  <link rel="self"
+        href="/catalog/v2/entries"
+        type="application/atom+xml;profile=opds-catalog;kind=acquisition"/>
+  <link rel="start"
+        href="/catalog/v2/root.xml"
+        type="application/atom+xml;profile=opds-catalog;kind=navigation"/>
+  <link rel="up"
+        href="/catalog/v2/root.xml"
+        type="application/atom+xml;profile=opds-catalog;kind=navigation"/>
+
+  <title>All Entries</title>
+  <updated>2026-11-11T03:34:11Z</updated>
+
+  <entry>
+    <id>urn:uuid:5198c709-7c5b-169d-2fba-b93695942782</id>
+    <title>Ray Charles</title>
+    <updated>2026-08-02T00:00:00Z</updated>
+    <summary>Wikipedia articles about Ray Charles</summary>
+    <language>eng</language>
+    <name>wikipedia_en_ray-charles</name>
+    <flavour>nopic</flavour>
+    <category>wikipedia</category>
+    <tags>wikipedia;_category:wikipedia;_pictures:no;_videos:no;_details:yes;_ftindex:yes</tags>
+    <articleCount>340</articleCount>
+    <mediaCount>25</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/5198c709-7c5b-169d-2fba-b93695942782/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/wikipedia_en_ray-charles_nopic_2026-08" />
+    <author>
+      <name>Wikipedia</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-08-02T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:6c295ef1-30d7-46f0-aed9-9652a61291c8</id>
+    <title>OSM - Bahrain</title>
+    <updated>2026-11-09T00:00:00Z</updated>
+    <summary>Offline OpenStreetMap for Bahrain. Vector tiles rendered client-side.</summary>
+    <language>eng</language>
+    <name>osm_osm_-_bahrain</name>
+    <flavour>maxi</flavour>
+    <category></category>
+    <tags>maps;osm;offline;_pictures:yes;_ftindex:yes;_videos:yes;_details:yes</tags>
+    <articleCount>149</articleCount>
+    <mediaCount>1825</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/6c295ef1-30d7-46f0-aed9-9652a61291c8/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/osm-bahrain-2026-11-09" />
+    <author>
+      <name>OpenStreetMap contributors</name>
+    </author>
+    <publisher>
+      <name>create_osm_zim</name>
+    </publisher>
+    <dc:issued>2026-11-09T00:00:00Z</dc:issued>
+    
+  </entry>
+  <entry>
+    <id>urn:uuid:b37270fd-f267-39ba-fc4f-9f3c720e5d8f</id>
+    <title>Knots by Wikipedia</title>
+    <updated>2026-10-18T00:00:00Z</updated>
+    <summary>A subset of Wikipedia encyclopedia dedicated to knots</summary>
+    <language>eng</language>
+    <name>wikipedia_en_knots</name>
+    <flavour>maxi</flavour>
+    <category>wikipedia</category>
+    <tags>wikipedia;_category:wikipedia;_pictures:yes;_videos:no;_details:yes;_ftindex:yes</tags>
+    <articleCount>1735</articleCount>
+    <mediaCount>3586</mediaCount>
+    <link rel="http://opds-spec.org/image/thumbnail"
+          href="/catalog/v2/illustration/b37270fd-f267-39ba-fc4f-9f3c720e5d8f/?size=48"
+          type="image/png;width=48;height=48;scale=1"/>
+    <link type="text/html" href="/content/wikipedia_en_knots_maxi_2026-10" />
+    <author>
+      <name>Wikipedia</name>
+    </author>
+    <publisher>
+      <name>openZIM</name>
+    </publisher>
+    <dc:issued>2026-10-18T00:00:00Z</dc:issued>
+    
+  </entry>
+</feed>
