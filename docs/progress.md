@@ -30,6 +30,18 @@ Screenshots: `docs/phase1-evidence/`.
   - Safety note on health and safety questions; a warning if parts of an answer can't be found in the sources.
   - Questions are never written to the log.
 
+## Phase 2 additions (tested here)
+- **Search all books** from the Library page: title matches first, then mentions, mixed fairly between books;
+  maps excluded; first 15 results with "Show more"; meaningless snippets hidden.
+- Book list with **cover pictures and sizes** ("1,735 articles"), biggest first; grouped by kind when there are more than 6 books;
+  language shown only when books are in different languages.
+- **Internet links** in books show "That link needs the internet, so it can't open here." in the top bar.
+- **"Loading the map…"** in the top bar until the map is drawn; a warning after a minute.
+- **Old computers without 3D drawing:** Maps page explains it and greys out the maps; opening a map anyway explains at once.
+- Kiwix's menu-language button is hidden in the reader (it could leave menus in an unknown language).
+- **Map dragging with a real mouse and the mouse wheel: confirmed working.**
+- Fixed: text typed in the Library search box was lost when the app's status changed.
+
 ## Ask the AI: measured on this cloud computer (4 CPU cores, fast disk)
 | Step | Time |
 |---|---|
@@ -46,12 +58,14 @@ numbers a citation wrongly. Retrieval improvements and the automatic checks redu
 must still be read with the sources, which is what the on-screen notice says.
 
 ## Tests
-- `npm test`: 59 unit tests (now also: text extraction, passage splitting and ranking, keywords, citation repair, grounding check, memory budget, retriever);
+- `npm test`: 62 unit tests (now also: text extraction, passage splitting and ranking, keywords, citation repair, grounding check, memory budget, retriever);
   previously 40 (memory tiers incl. exactly 6/12/24 GB, Windows paths and drive letters,
   Kiwix catalog and search parsing, network rule, ports, config file, crash cleanup, page-address guard, message wording).
 - `tests/e2e/walkthrough.js`: 25 to 26 checks clicking through the real app.
 - `tests/e2e/error-cases.js`: 13 checks for the failure situations above.
 - `tests/e2e/ask-flow.js`: 17 checks of Ask with the real 3B model (answer, sources, follow-up, Stop, New question, not covered, privacy, no internet).
+- `tests/e2e/phase2.js` (16 checks) and `tests/e2e/phase2b.js` (9 checks): search, internet-link message, map loading,
+  real-mouse map drag and zoom, book pictures and sizes, language button hidden, no-3D-drawing computers.
 - `tests/integration/ask-cli.js`: ask questions from the command line against running engines (for tuning).
 
 ## Not tested yet
@@ -64,3 +78,10 @@ must still be read with the sources, which is what the on-screen notice says.
 3. Optional: a list of 10 to 20 typical customer questions (first aid, water, food, repairs...).
    I would use them as a test set so answer quality can be checked after every change.
 4. Later, for real-world tuning: which Wikipedia ZIM (and other books) you ship, so I can test with a large one.
+
+## Testing on your PC (status)
+Your PC's folders ("Proj" on the USB-C drive and "OFFLINE PREP" on C:) appear in Remote Control, but your computer
+does not offer them to cloud sessions (same result on both drives, so the USB-C drive is not the cause; most likely the
+desktop app needs an update, or the feature is not available for this account yet).
+Reliable alternative: start a **local** Claude Code session in the desktop app in the OFFLINE PREP folder and clone
+`Ncascio1/offlinelibllama` from GitHub. It can then test on Windows with your Wikipedia and model.

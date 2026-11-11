@@ -57,6 +57,7 @@ button:disabled { opacity: .5; cursor: not-allowed; }
   display: block; width: 100%; text-align: left; background: var(--card); color: var(--ink);
   border: 2px solid var(--line); border-radius: 12px; padding: 20px 22px; min-height: 96px; cursor: pointer; font: inherit;
 }
+.item:disabled { opacity: .55; cursor: not-allowed; }
 .tile { display: flex; flex-direction: column; justify-content: flex-start; }
 .tile:hover, .item:hover { border-color: var(--blue); }
 .tile strong, .item strong { display: block; font-family: Bahnschrift, "Segoe UI", sans-serif; font-size: 1.4rem; color: var(--blue); margin-bottom: 4px; }
@@ -91,3 +92,11 @@ button.result strong { color: var(--blue); text-decoration: underline; font-size
 button.result .from { color: var(--muted); }
 button.result .snippet { display: block; color: var(--muted); font-size: .95rem; margin-top: 2px; }
 .ask input[type=text] { flex: 1; }
+
+/* Library book list with cover pictures */
+.item.book { display: flex; gap: 16px; align-items: flex-start; }
+.item.book img, .item.book .noicon { width: 48px; height: 48px; flex: none; border-radius: 6px; background: var(--paper); }
+.item.book .text { display: block; }
+.item.book .text > span { display: block; }
+.item.book .small { margin-top: 4px; }
+h3.group { font-size: 1.2rem; margin: 24px 0 10px; }

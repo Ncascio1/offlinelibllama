@@ -55,6 +55,9 @@ function parseCatalog(xml) {
       language: tagText(e, 'language'),
       tags: tagText(e, 'tags'),
       articleCount: Number(tagText(e, 'articleCount')) || 0,
+      category: tagText(e, 'category'),
+      // The book's small cover picture (served by Kiwix on this computer).
+      illustration: decodeEntities((e.match(/<link[^>]*rel="http:\/\/opds-spec\.org\/image\/thumbnail"[^>]*href="([^"]+)"/) || [])[1] || ''),
     };
     if (!book.id || !book.slug) continue; // unusable entry; skip it
     book.isMap = isMapBook(book);

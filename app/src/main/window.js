@@ -94,6 +94,16 @@ function createMainWindow({ preload, isPackaged, log, onClose, onNavChanged, onN
     if (cmd === 'browser-forward' && h.canGoForward()) h.goForward();
   });
 
+  // Kiwix's reader has a button that switches its menus to another language. For our
+  // customers that only causes confusion (and could leave menus in an unknown language),
+  // so it is hidden. Kiwix's other buttons (book home, random article, search) stay.
+  content.webContents.on('dom-ready', () => {
+    const url = content.webContents.getURL();
+    if (/^http:\/\/127\.0\.0\.1:\d+\/viewer/.test(url)) {
+      content.webContents.insertCSS('#uiLanguageSelectorButton, #uiLanguageSelector { display: none !important; }').catch(() => {});
+    }
+  });
+
   const navChanged = () => { content.webContents.setZoomFactor(currentZoom); if (onNavChanged) onNavChanged(); };
   content.webContents.on('did-navigate', navChanged);
   content.webContents.on('did-navigate-in-page', navChanged);

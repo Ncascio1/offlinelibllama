@@ -67,8 +67,7 @@ const PAGES = {
       books.length ? searchBox() : null,
       books.length ? h('h2', { style: 'margin-top:28px' }, 'Books') : null,
       books.length ? h('p', {}, 'Or choose a book. Inside a book, the search box at the top searches that book only.') : null,
-      h('div', { class: 'list' }, ...books.map(b =>
-        h('button', { class: 'item', onclick: () => cmd('open-book', b.slug) }, h('strong', {}, b.title), b.summary ? h('span', {}, b.summary) : null))),
+      ...bookList(books),
     ];
   },
 
@@ -81,7 +80,9 @@ const PAGES = {
       s.library.state === 'ready' && maps.length === 0 ? h('div', { class: 'notice warn' }, 'There are no maps on this drive.') : null,
       maps.length ? h('p', {}, 'Choose a map. Drag to move around, use the mouse wheel or the + and − buttons to zoom, and type a place name in the search box.') : null,
       h('div', { class: 'list' }, ...maps.map(b =>
-        h('button', { class: 'item', onclick: () => cmd('open-book', b.slug) }, h('strong', {}, b.title), h('span', {}, 'Street map')))),
+        h('button', { class: 'item book', disabled: !hasWebgl(), onclick: () => cmd('open-book', b.slug) },
+          b.icon ? h('img', { src: b.icon, alt: '', width: 48, height: 48 }) : h('span', { class: 'noicon', 'aria-hidden': 'true' }),
+          h('span', { class: 'text' }, h('strong', {}, b.title), h('span', {}, 'Street map'))))),
     ];
   },
 
@@ -109,6 +110,52 @@ const PAGES = {
     return [h('h1', {}, title), h('p', {}, text)];
   },
 };
+
+// ---- Library book list ----
+// Groups are used only when there are many books; small drives get one simple list.
+const GROUPS = [
+  ['Encyclopedias', c => /^(wikipedia|wikinews)$/.test(c)],
+  ['Dictionaries', c => /^wiktionary$/.test(c)],
+  ['How-to books and guides', c => /^(wikibooks|wikihow|wikivoyage|stack_exchange|other_howto)$/.test(c)],
+  ['Classic books', c => /^(gutenberg|wikisource)$/.test(c)],
+  ['Talks and videos', c => /^(ted|youtube|videos?)$/.test(c)],
+];
+const GROUP_WHEN_MORE_THAN = 6;
+
+function sizeText(n) {
+  if (!n) return '';
+  if (n >= 1e6) return `about ${(n / 1e6).toFixed(1).replace(/\.0$/, '')} million articles`;
+  return `${n.toLocaleString('en-US')} article${n === 1 ? '' : 's'}`;
+}
+
+let languageNames = null;
+function languageName(code) {
+  try { languageNames = languageNames || new Intl.DisplayNames(['en'], { type: 'language' }); return languageNames.of(code) || code; }
+  catch { return code; }
+}
+
+function bookButton(b, showLanguage) {
+  const details = [sizeText(b.articleCount), showLanguage && b.language ? languageName(b.language.split(',')[0]) : ''].filter(Boolean).join(' · ');
+  return h('button', { class: 'item book', onclick: () => cmd('open-book', b.slug) },
+    b.icon ? h('img', { src: b.icon, alt: '', width: 48, height: 48 }) : h('span', { class: 'noicon', 'aria-hidden': 'true' }),
+    h('span', { class: 'text' }, h('strong', {}, b.title), b.summary ? h('span', {}, b.summary) : null,
+      details ? h('span', { class: 'small' }, details) : null));
+}
+
+function bookList(books) {
+  const showLanguage = new Set(books.map(b => b.language)).size > 1;
+  const sorted = books.slice().sort((a, b) => b.articleCount - a.articleCount); // biggest (usually Wikipedia) first
+  if (books.length <= GROUP_WHEN_MORE_THAN) return [h('div', { class: 'list' }, ...sorted.map(b => bookButton(b, showLanguage)))];
+  const out = [];
+  const used = new Set();
+  for (const [name, test] of [...GROUPS, ['Other books', () => true]]) {
+    const inGroup = sorted.filter(b => !used.has(b) && test((b.category || '').toLowerCase()));
+    if (!inGroup.length) continue;
+    inGroup.forEach(b => used.add(b));
+    out.push(h('h3', { class: 'group' }, name), h('div', { class: 'list' }, ...inGroup.map(b => bookButton(b, showLanguage))));
+  }
+  return out;
+}
 
 // "Search all books" box (Library page).
 function searchBox() {

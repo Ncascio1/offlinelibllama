@@ -58,7 +58,9 @@ app.commandLine.appendSwitch('disable-background-networking');
 app.commandLine.appendSwitch('disable-component-update');
 app.commandLine.appendSwitch('no-pings');
 // Maps need WebGL. On PCs without a usable graphics card, draw it in software.
-app.commandLine.appendSwitch('enable-unsafe-swiftshader');
+// (Automated tests can imitate a very old PC that has no 3D drawing at all.)
+if (process.env.OL_TEST_NO_WEBGL === '1') app.commandLine.appendSwitch('disable-3d-apis');
+else app.commandLine.appendSwitch('enable-unsafe-swiftshader');
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true, codeCache: false } },
 ]);
@@ -115,7 +117,9 @@ function broadcast() {
 }
 
 function publicBooks(books) {
-  return books.map(b => ({ id: b.id, slug: b.slug, title: b.displayTitle, summary: b.summary, isMap: b.isMap, language: b.language }));
+  return books.map(b => ({ id: b.id, slug: b.slug, title: b.displayTitle, summary: b.summary, isMap: b.isMap, language: b.language,
+    articleCount: b.articleCount, category: b.category,
+    icon: b.illustration && kiwix ? kiwix.baseUrl + b.illustration : '' }));
 }
 
 // Which top-bar section is the content area showing?
@@ -146,7 +150,11 @@ async function watchMapLoading(url) {
   showNotice({ text: 'Loading the map…', kind: 'info', ms: 0 });
   const started = Date.now();
   let warned = false;
+  const NO_MAPS = 'This computer cannot draw the maps. The Library and the AI still work.';
   while (id === mapWatch && !wc.isDestroyed() && wc.getURL() === url) {
+    // Very old computers without any 3D drawing support: say so straight away.
+    const noWebgl = await wc.executeJavaScript("(() => { try { const c = document.createElement('canvas'); return !(c.getContext('webgl2') || c.getContext('webgl')); } catch { return true; } })()", true).catch(() => false);
+    if (noWebgl) { log.warn('map opened but this computer has no WebGL'); return showNotice({ text: NO_MAPS, kind: 'warn', ms: 0 }); }
     const drawn = await wc.executeJavaScript('!!(window.__streetzim_map && window.__streetzim_map.loaded && window.__streetzim_map.loaded())', true).catch(() => false);
     if (drawn) { log.info(`map drawn after ${Date.now() - started} ms`); return showNotice({ text: '', ms: 0 }); }
     if (!warned && Date.now() - started > 60000) {
