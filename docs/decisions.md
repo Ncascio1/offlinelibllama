@@ -113,8 +113,9 @@ Spellcheck is also switched off.
 
 The StreetZim file `osm-bahrain-2026-11-09.zim` has the catalog name
 `osm_osm_-_bahrain`, title "OSM - Bahrain" and tags `maps;osm;offline`. A book is
-a map if its tags include `maps` or `osm`. The prototype's file-name guess
-(`street`, `map`, `osm`) is kept only as a backup. The menu shows the title, with
+a map if its tags include `maps` or `osm`. The prototype's file-name guess is kept only as a
+narrow backup (whole words `streetzim`, `osm`, `openstreetmap`, `map(s)`, and only for books
+with no category), because "TED street art" was wrongly listed as a map in testing. The menu shows the title, with
 the "OSM - " prefix removed ("Bahrain").
 
 ---
@@ -169,3 +170,18 @@ Each question goes through these steps (code in `app/src/main/ask/`):
 own knowledge (it invented bowline-tying steps when the right passage was
 missing) and numbered citations wrongly. Better retrieval fixed the bowline case;
 the checks are a safety net for the cases retrieval can't fix.
+
+---
+
+## D10. PDFs and videos inside books
+
+- Some books (for example the "zimgit" prepper guides: water, medicine, food) are collections
+  of PDF documents. They open in Chromium's built-in PDF viewer. That viewer is part of the
+  program, but runs under two internal addresses that the network rule allows by exact name:
+  `chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai` and `chrome://resources`. Nothing else
+  of those kinds is allowed. Printing works; saving to the computer is refused with a message.
+- Videos (TED books, WebM format) play with the video support built into Electron.
+- **Limit:** the AI reads only web pages, not PDFs, and books without a search index can be
+  searched by title only. Letting the AI read PDFs would need a PDF text reader (for example
+  Mozilla's pdf.js, Apache 2.0). Not added: it is a new dependency, needs your approval, and
+  should be judged after the Windows test with the real books.

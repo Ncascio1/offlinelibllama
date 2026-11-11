@@ -24,13 +24,16 @@ function tagText(xml, tag) {
   return m ? decodeEntities(m[1].trim()) : '';
 }
 
-// Map detection: tags first (reliable), then the prototype's name guess as backup.
-function isMapBook({ tags, name, slug, title }) {
+// Map detection: tags first (reliable: StreetZim maps are tagged "maps;osm").
+// Backup for untagged files: whole words in the name, and only for books that have
+// no category of their own. ("TED street art" has category "ted": not a map.)
+function isMapBook({ tags, name, slug, title, category = '' }) {
   const tagList = tags.toLowerCase().split(';').map(t => t.trim());
   if (tagList.includes('maps') || tagList.includes('osm')) return true;
-  const text = `${name} ${slug} ${title}`.toLowerCase();
+  if (category || tagList.some(t => t.startsWith('_category:'))) return false;
+  const text = `${name} ${slug} ${title}`.toLowerCase().replace(/[_-]/g, ' ');
   if (text.includes('wikipedia')) return false;
-  return /street|map|osm/.test(text);
+  return /\b(streetzim|osm|openstreetmap|maps?)\b/.test(text);
 }
 
 // "OSM - Bahrain" -> "Bahrain": friendlier menu names for maps.

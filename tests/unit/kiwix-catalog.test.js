@@ -35,6 +35,10 @@ test('map detection rules', () => {
   assert.ok(isMapBook({ tags: '', name: 'streetzim_ohio', slug: 'streetzim_ohio', title: 'Ohio' }));
   assert.ok(!isMapBook({ tags: 'wikipedia', name: 'wikipedia_en_maps', slug: 'wikipedia_en_maps', title: 'Maps on Wikipedia' }));
   assert.ok(!isMapBook({ tags: 'medicine', name: 'wikem', slug: 'wikem', title: 'WikEM' }));
+  // Real case: a TED talk collection about street art is not a street map.
+  assert.ok(!isMapBook({ tags: '_category:ted;ted;_videos:yes', category: 'ted', name: 'ted_mul_street-art', slug: 'ted_mul_street-art_2026-09', title: 'TED street art' }));
+  assert.ok(!isMapBook({ tags: '', name: 'street_food_guide', slug: 'street_food_guide', title: 'Street food' }));
+  assert.ok(isMapBook({ tags: '', name: 'osm-ohio', slug: 'osm-ohio_2026', title: 'Ohio' }));
 });
 
 test('friendly map titles', () => {

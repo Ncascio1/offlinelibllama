@@ -41,6 +41,15 @@ Screenshots: `docs/phase1-evidence/`.
 - Kiwix's menu-language button is hidden in the reader (it could leave menus in an unknown language).
 - **Map dragging with a real mouse and the mouse wheel: confirmed working.**
 - Fixed: text typed in the Library search box was lost when the app's status changed.
+- **Several maps:** each listed by place name; switching between them works; memory stays about 690 to 730 MB.
+- **PDF guides inside books** (for example the Water Treatment Library) open in the built-in viewer; printing works;
+  saving to the computer is refused with a message (the app must not write outside the drive).
+- **Videos inside books** (TED talks) play.
+- Fixed: "TED street art" was listed as a map (the prototype's name rule was too broad; maps are now recognised by their tags).
+- Fixed: the AI could have been fed raw PDF data as text; it now reads only web pages.
+
+Known limit: books without a search index (such as the Water Treatment Library) can only be found by
+document title, and the AI cannot read PDF documents. Reading PDFs would need an extra component (see D10).
 
 ## Ask the AI: measured on this cloud computer (4 CPU cores, fast disk)
 | Step | Time |
@@ -58,7 +67,7 @@ numbers a citation wrongly. Retrieval improvements and the automatic checks redu
 must still be read with the sources, which is what the on-screen notice says.
 
 ## Tests
-- `npm test`: 62 unit tests (now also: text extraction, passage splitting and ranking, keywords, citation repair, grounding check, memory budget, retriever);
+- `npm test`: 64 unit tests (now also: text extraction, passage splitting and ranking, keywords, citation repair, grounding check, memory budget, retriever);
   previously 40 (memory tiers incl. exactly 6/12/24 GB, Windows paths and drive letters,
   Kiwix catalog and search parsing, network rule, ports, config file, crash cleanup, page-address guard, message wording).
 - `tests/e2e/walkthrough.js`: 25 to 26 checks clicking through the real app.
@@ -66,6 +75,7 @@ must still be read with the sources, which is what the on-screen notice says.
 - `tests/e2e/ask-flow.js`: 17 checks of Ask with the real 3B model (answer, sources, follow-up, Stop, New question, not covered, privacy, no internet).
 - `tests/e2e/phase2.js` (16 checks) and `tests/e2e/phase2b.js` (9 checks): search, internet-link message, map loading,
   real-mouse map drag and zoom, book pictures and sizes, language button hidden, no-3D-drawing computers.
+- `tests/e2e/phase2c.js` (10 checks): several maps, PDF guides, saving refused, videos, language labels.
 - `tests/integration/ask-cli.js`: ask questions from the command line against running engines (for tuning).
 
 ## Not tested yet
@@ -83,5 +93,6 @@ must still be read with the sources, which is what the on-screen notice says.
 Your PC's folders ("Proj" on the USB-C drive and "OFFLINE PREP" on C:) appear in Remote Control, but your computer
 does not offer them to cloud sessions (same result on both drives, so the USB-C drive is not the cause; most likely the
 desktop app needs an update, or the feature is not available for this account yet).
+**See `docs/local-session-handoff.md`** for the exact steps and the message to paste.
 Reliable alternative: start a **local** Claude Code session in the desktop app in the OFFLINE PREP folder and clone
 `Ncascio1/offlinelibllama` from GitHub. It can then test on Windows with your Wikipedia and model.

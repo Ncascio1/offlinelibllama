@@ -8,6 +8,11 @@
 
 const LOCAL_SCHEMES = new Set(['app:', 'data:', 'blob:', 'devtools:', 'chrome-error:']);
 
+// Chromium's built-in PDF viewer. It is part of the program (no internet), but it
+// runs under this fixed internal address, so it must be allowed by name to show
+// PDF documents that are inside books (for example the water treatment guides).
+const PDF_VIEWER_ID = 'mhjfbmdgcfjbbpaeojofohoefgiehjai';
+
 // "MAP * ~NOTFOUND" = every host name is "not found"; EXCLUDE keeps 127.0.0.1 working.
 const HOST_RESOLVER_RULES = 'MAP * ~NOTFOUND, EXCLUDE 127.0.0.1';
 
@@ -15,6 +20,8 @@ function isAllowedUrl(url) {
   let u;
   try { u = new URL(url); } catch { return false; }
   if (LOCAL_SCHEMES.has(u.protocol)) return true;
+  if (u.protocol === 'chrome-extension:') return u.hostname === PDF_VIEWER_ID;
+  if (u.protocol === 'chrome:') return u.hostname === 'resources'; // the PDF viewer's built-in parts
   if (u.protocol === 'http:' || u.protocol === 'ws:') return u.hostname === '127.0.0.1';
   return false; // https:, file:, ftp:, anything else
 }
@@ -27,4 +34,4 @@ function isKiwixUrl(url, kiwixPort) {
   } catch { return false; }
 }
 
-module.exports = { isAllowedUrl, isKiwixUrl, HOST_RESOLVER_RULES };
+module.exports = { isAllowedUrl, isKiwixUrl, HOST_RESOLVER_RULES, PDF_VIEWER_ID };

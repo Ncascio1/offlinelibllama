@@ -143,7 +143,9 @@ function bookButton(b, showLanguage) {
 }
 
 function bookList(books) {
-  const showLanguage = new Set(books.map(b => b.language)).size > 1;
+  // Show languages only when the books really are in different main languages
+  // (a TED collection marked "eng,ara,..." is still an English book here).
+  const showLanguage = new Set(books.map(b => (b.language || '').split(',')[0])).size > 1;
   const sorted = books.slice().sort((a, b) => b.articleCount - a.articleCount); // biggest (usually Wikipedia) first
   if (books.length <= GROUP_WHEN_MORE_THAN) return [h('div', { class: 'list' }, ...sorted.map(b => bookButton(b, showLanguage)))];
   const out = [];

@@ -49,6 +49,10 @@ class KiwixRetriever {
     const res = await this.fetch(this.baseUrl + path, { signal: anySignal(signal, 15000) });
     if (!res.ok) throw new Error(`HTTP ${res.status} for ${path.slice(0, 80)}`);
     const finalPath = res.url && res.url.startsWith(this.baseUrl) ? res.url.slice(this.baseUrl.length) : path;
+    // Only web pages can be read as text. PDFs, videos and pictures are skipped
+    // (otherwise raw file data would reach the AI as if it were text).
+    const type = (res.headers && res.headers.get && res.headers.get('content-type')) || 'text/html';
+    if (!/html|text\/plain/i.test(type)) throw Object.assign(new Error(`not a web page (${type.split(';')[0]})`), { skip: true });
     return { html: await res.text(), finalLink: normLink(finalPath) };
   }
 
@@ -120,7 +124,7 @@ class KiwixRetriever {
                  text: truncateWords(text, MAX_ARTICLE_WORDS), searchScore: a.score };
       } catch (e) {
         if (signal && signal.aborted) throw e;
-        this.log.warn('could not read article', a.link.slice(0, 80), e.message);
+        if (!e.skip) this.log.warn('could not read article', a.link.slice(0, 80), e.message);
         return null;
       }
     }))).filter(a => a && a.text)

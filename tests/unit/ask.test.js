@@ -187,3 +187,18 @@ test('retriever: search plan tries all words, the question words, then fewer wor
   assert.deepStrictEqual(plan.slice(0, 3), ['bowline knot climbing', 'tie bowline knot', 'bowline knot']);
   assert.ok(plan.includes('bowline'));
 });
+
+test('retriever: PDFs and other non-web files are never fed to the AI as text', async () => {
+  const fakeFetch = async url => {
+    const u = url.replace('http://k', '');
+    if (u.startsWith('/search')) return { ok: true, url, text: async () => '' };
+    if (u.startsWith('/suggest')) return { ok: true, url, json: async () => [{ kind: 'path', value: 'Water guide', path: 'files/Water.pdf' }, { kind: 'path', value: 'Boiling', path: 'Boiling' }] };
+    if (u.endsWith('.pdf')) return { ok: true, url, headers: new Map([['content-type', 'application/pdf']]), text: async () => '%PDF-1.4 binary water water water' };
+    return { ok: true, url, headers: new Map([['content-type', 'text/html']]), text: async () => '<html><head><title>Boiling</title></head><body><p>Boil water for one minute to make it safe.</p></body></html>' };
+  };
+  const books = [{ id: 'w', slug: 'water', title: 'Water', isMap: false, hasFullTextIndex: false }];
+  const r = new KiwixRetriever({ baseUrl: 'http://k', books, log: { warn() {}, info() {} }, fetchImpl: fakeFetch });
+  const { articles, passages } = await r.retrieve({ question: 'How do I make water safe?', keywords: ['water'] });
+  assert.deepStrictEqual(articles.map(a => a.title), ['Boiling']);
+  assert.ok(!passages.some(p => p.text.includes('%PDF')));
+});

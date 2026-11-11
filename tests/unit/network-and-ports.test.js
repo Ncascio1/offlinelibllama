@@ -16,6 +16,13 @@ test('blocked: the internet and everything else', () => {
     assert.ok(!isAllowedUrl(u), u);
 });
 
+test('only the built-in PDF viewer may use an extension address', () => {
+  assert.ok(isAllowedUrl('chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/index.html'));
+  assert.ok(!isAllowedUrl('chrome-extension://abcdefghijklmnopabcdefghijklmnop/evil.html'));
+  assert.ok(isAllowedUrl('chrome://resources/js/load_time_data.js'));
+  assert.ok(!isAllowedUrl('chrome://settings/'));
+});
+
 test('kiwix page check matches the Kiwix port only', () => {
   assert.ok(isKiwixUrl('http://127.0.0.1:4000/content/a/b', 4000));
   assert.ok(!isKiwixUrl('http://127.0.0.1:4001/content/a/b', 4000));

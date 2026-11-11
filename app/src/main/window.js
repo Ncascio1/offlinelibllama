@@ -15,7 +15,7 @@ const ZOOM_STEPS = [0.67, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 2.5, 3];
 let currentZoom = 1;
 
 // Apply the network rule and other lock-downs to a browsing session.
-function lockDownSession(ses, log) {
+function lockDownSession(ses, log, onNotice) {
   ses.webRequest.onBeforeRequest((details, cb) => {
     const ok = isAllowedUrl(details.url);
     if (!ok) log.warn('blocked request to', safeHost(details.url));
@@ -24,7 +24,12 @@ function lockDownSession(ses, log) {
   ses.setPermissionRequestHandler((_wc, _permission, cb) => cb(false)); // no camera, location, notifications...
   ses.setPermissionCheckHandler(() => false);
   ses.setSpellCheckerEnabled(false); // would otherwise download dictionaries
-  ses.on('will-download', e => e.preventDefault()); // books are read in the app, never saved to the PC
+  // Books are read in the app, never saved to the PC (the app must not write outside the drive).
+  ses.on('will-download', e => {
+    e.preventDefault();
+    log.info('blocked a download (saving to the computer is turned off)');
+    if (onNotice) onNotice({ text: 'Saving files to this computer is turned off. You can read and print documents here.', kind: 'info', ms: 8000 });
+  });
 }
 
 function safeHost(url) { try { return new URL(url).host || url.slice(0, 40); } catch { return url.slice(0, 40); } }
@@ -46,14 +51,15 @@ function createMainWindow({ preload, isPackaged, log, onClose, onNavChanged, onN
 
   // Content pages live in an in-memory session: no cache written to the drive.
   // Both views use in-memory sessions: no web cache is ever written to the drive.
-  lockDownSession(session.defaultSession, log);
-  lockDownSession(session.fromPartition('ui'), log);
-  lockDownSession(session.fromPartition('content'), log);
+  lockDownSession(session.defaultSession, log, onNotice);
+  lockDownSession(session.fromPartition('ui'), log, onNotice);
+  lockDownSession(session.fromPartition('content'), log, onNotice);
 
   const common = { contextIsolation: true, sandbox: true, nodeIntegration: false, spellcheck: false,
                    devTools: !isPackaged, preload, webviewTag: false, navigateOnDragDrop: false };
   const bar = new WebContentsView({ webPreferences: { ...common, partition: 'ui' } });
-  const content = new WebContentsView({ webPreferences: { ...common, partition: 'content' } });
+  // plugins: true switches on the built-in PDF viewer (PDF guides inside books).
+  const content = new WebContentsView({ webPreferences: { ...common, partition: 'content', plugins: true } });
   win.contentView.addChildView(content);
   win.contentView.addChildView(bar);
 
