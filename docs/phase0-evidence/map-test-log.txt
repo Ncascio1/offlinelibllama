@@ -1,0 +1,17 @@
+[264ms] page loaded in 198 ms
+[877ms] map ready: {"ok":true,"ms":533,"hasMapObj":true,"zoom":10.583168263075814,"center":{"lng":50.575000000000045,"lat":26.19115095282389},"canvas":true,"glNull":false}
+[2415ms] screenshot 1-initial
+[4220ms] center after pan: {"lng":50.575000000000045,"lat":26.19115095282389}
+[5026ms] after wheel zoom: {"zoom":10.583168263075933,"settleMs":384} total 806 ms
+[5071ms] screenshot 2-pan-zoom
+[5072ms] search box: {"found":true,"id":"search-input","placeholder":"Search 36,679 places..."}
+[6872ms] screenshot 3-search-typed
+[9878ms] after clicking search result: {"center":{"lng":50.582239999999956,"lat":26.22886115088042},"zoom":14}
+[9964ms] screenshot 4-search-result
+[11967ms] zoom after clicking +: 15
+[12622ms] pan by 400x250 px: {"center":{"lng":50.59082306884409,"lat":26.224048975987273},"redrawMs":653}
+[14691ms] animated zoom (2 s) smoothness: {"framesIn2s":51,"fps":25}
+[14761ms] screenshot 4-search-result
+[14762ms] memory (all Electron processes, working set) ~ 790 MB
+[14762ms] blocked requests: 0 
+[14762ms] page errors: 10 [streetzim] tile fetch failed attempt 1 http://127.0.0.1:18100/content/osm-bahrain-2026-11-09/tiles/11/1311/870.pbf AbortError: signal is aborted without reason: code=20 | [streetzim] tile fetch failed attempt 1 http://127.0.0.1:18100/content/osm-bahrain-2026-11-09/tiles/11/1312/870.pbf AbortError: signal is aborted without reason: code=20 | [streetzim] tile fetch failed attempt 1 http://127.0.0.1:18100/content/osm-bahrain-2026-11-09/tiles/11/1310/870.pbf AbortError: signal is aborted without reason: code=20 | [streetzim] tile fetch failed attempt 1 http://127.0.0.1:18100/content/osm-bahrain-2026-11-09/tiles/12/2624/1739.pbf AbortError: signal is aborted without reason: code=20 | [streetzim] tile fetch failed attempt 1 http://127.0.0.1:18100/content/osm-bahrain-2026-11-09/tiles/12/2622/1737.pbf AbortError: signal is aborted without reason: code=20 | [streetzim] tile fetch failed attempt 1 http://127.0.0.1:18100/content/osm-bahrain-2026-11-09/tiles/12/2622/1739.pbf AbortError: signal is aborted without reason: code=20

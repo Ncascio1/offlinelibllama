@@ -52,28 +52,46 @@ address name for links people click.
 
 **Not tested on Windows:** the Windows `kiwix-serve.exe` itself (same version).
 
-## Spike 2. StreetZim maps: partly done, needs your map file
+## Spike 2. StreetZim maps: works, including with no graphics card
 
-**Tried:** the StreetZim website and its downloads are on sites this cloud
-computer may not reach, so I did not get a map file. Instead I tested what the
-map viewer depends on, inside the Electron window:
-- **WebGL** (maps draw with it): on this computer, which has **no graphics
-  card**, WebGL was missing by default. With Electron's software renderer
-  switched on (`--enable-unsafe-swiftshader`), WebGL 2 worked. ("Unsafe" is
-  Chromium's warning about running untrusted websites through it; we only show
-  our own local pages.)
-- **Background workers** (MapLibre uses them): work.
+**Tried:** downloaded the smallest StreetZim map (`osm-bahrain-2026-11-09.zim`,
+46 MB, checksum verified), served it with Kiwix, and opened its viewer in
+Electron on this computer, which has **no graphics card** (so all drawing was
+done by Electron's software renderer, SwiftShader). Spike code: `spikes/maps/`.
+Screenshots and log: `docs/phase0-evidence/`.
 
-**Recommend:** turn the software renderer on as a fallback. Show a plain message
-if WebGL still isn't available.
+**Saw:**
+- Map drawn and ready **0.6 s** after the page loaded.
+- **Search:** typing "Manama" listed matching places instantly; clicking the
+  first result jumped to the city at street level.
+- **Zoom:** the + button worked; an animated zoom ran at about **25 frames per
+  second** with software drawing on this 4-core server.
+- **Pan:** moving the map by a screen-width redrew in **0.65 s**.
+- **No internet needed:** zero requests outside 127.0.0.1. The only outside
+  links are the map credits (OpenStreetMap, OpenMapTiles), which the app blocks.
+- The service worker code in the viewer is only used on StreetZim's own
+  website, not when served by Kiwix. Background workers start from in-memory
+  `blob:` addresses, which the app allows.
+- The 10 console "errors" are map pieces cancelled because the view moved on.
+  This is normal MapLibre behaviour.
+- Memory: about 790 MB for all Electron parts while a map is open (Windows-style
+  "working set" count, which double-counts shared memory).
+- My simulated mouse *drag* did not move the map; clicks and typing did. This
+  is most likely my test harness (no real mouse in the virtual screen). **To
+  check by hand on Windows.**
+- **Network finding:** in one run Chromium's spellchecker tried to reach a Google
+  server. See D6 in `docs/decisions.md`: the app now blocks this at the
+  name-lookup level, re-tested and confirmed.
 
-**Still to do:** open a real StreetZim file in the app and test pan, zoom,
-search, speed with software rendering, and large file reads. **I need one of
-your StreetZim files** (the smallest one you have is ideal).
+**Recommend:** always allow the software-drawing fallback; recognise maps by
+their tags (D7). On a real old laptop, pan and zoom will be slower than here.
 
 ## Spike 3. llama.cpp: works, one Windows dependency to bundle
 
 **Tried:** `llama-server` b11900 with the tiny model, from the test drive path.
+Then re-tested everything below on **b12239** (your chosen version): all the same.
+Also confirmed the password option: requests without it are refused, while
+`/health` stays open for status checks.
 
 **Saw:**
 - Startup options that work:
@@ -180,15 +198,12 @@ up a program's file path than the one tested here.
    include `kiwix-serve.exe`). I have downloaded the exact version
    (3.8.1), so you don't need to unless you want your own copy:
    https://download.kiwix.org/release/kiwix-tools/kiwix-tools_win-x86_64-3.8.1.zip
-2. **One small StreetZim file** to test maps (upload it, or tell me where you
-   got it so I can download it).
-3. **Your 3B model:** its exact file name or download page, so I can check its
-   licence, size and chat format, and later test real answer quality.
-4. **"The llama":** which llama.cpp file did you download (exact zip name)? I
-   recommend `llama-b11900-bin-win-cpu-x64.zip` for now.
+2. ~~StreetZim file~~ done (Bahrain, 46 MB).
+3. ~~3B model name~~ done: Llama 3.2 3B Instruct Q4_K_M (see licence in D8).
+4. ~~llama.cpp version~~ done: b12239, use `llama-b12239-bin-win-cpu-x64.zip`.
 5. **A Windows PC test** of the spike, when you are ready. I will package it as
    a zip with step-by-step instructions.
-6. Your go-ahead on Electron (D1 in `docs/decisions.md`).
+6. ~~Go-ahead on Electron~~ approved.
 
 ## Unverified assumptions (honest list)
 
@@ -196,6 +211,5 @@ up a program's file path than the one tested here.
 - No console window flashes on Windows (based on the program type, not seen).
 - exFAT, NTFS, drive letter changes, USB 2 speed, antivirus reactions,
   Firewall prompts: all untested.
-- StreetZim works in the window (WebGL and workers work; the viewer itself is
-  untested).
+- Map dragging with a real mouse, and map speed on a real old laptop.
 - Your 3B model's speed and memory on 8 GB and 16 GB laptops.
