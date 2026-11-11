@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+     xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/"
+     xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Search: water</title>
+    <link>/search?pattern=water&amp;books.id=b37270fd-f267-39ba-fc4f-9f3c720e5d8f&amp;books.id=5198c709-7c5b-169d-2fba-b93695942782&amp;format=xml&amp;start=0&amp;pageLength=3</link>
+    <description>Search result for water</description>
+    <opensearch:totalResults>238</opensearch:totalResults>
+    <opensearch:startIndex>0</opensearch:startIndex>
+    <opensearch:itemsPerPage>3</opensearch:itemsPerPage>
+    <atom:link rel="search" type="application/opensearchdescription+xml" href="/search/searchdescription.xml"/>
+    <opensearch:Query role="request"
+      searchTerms="water"
+      startIndex="0"
+      count="3"
+    />
+    <item>
+      <title>Water knot</title>
+      <link>/content/wikipedia_en_knots_maxi_2026-10/Water_knot</link>
+        <description><b>Water</b> knot <b>Water</b> knot Names <b>Water</b> knot, Tape knot, Ring bend, Grass knot, Overhand follow through Category Bend Related Overhand knot, beer knot, overhand bend Typical use To join webbing for climbing Caveat Ends should be left long, knot should be tightened and inspected before each use. Difficult to untie. ABoK #296, #1412, #343 Instructions animatedknots.com The <b>water</b> knot (also tape knot, ring bend, grass knot, or overhand follow-through) is a knot frequently used in climbing for joining two......</description>
+        <book>
+          <title>Knots by Wikipedia</title>
+        </book>
+        <wordCount>1,107</wordCount>
+    </item>
+    <item>
+      <title>Water bowline</title>
+      <link>/content/wikipedia_en_knots_maxi_2026-10/Water_bowline</link>
+        <description><b>Water</b> bowline <b>Water</b> bowline Category Loop Related double bowline Releasing Non-jamming Typical use Wet conditions ABoK #1012 The <b>water</b> bowline is a type of knot designed for use in wet conditions where other knots may slip or jam. Although similar in finished appearance to the double bowline, the <b>water</b> bowline is formed with a clove hitch as the loop in the standing part of the rope. This is similar to the double bowline, which puts the running end through a round turn. The additional friction......</description>
+        <book>
+          <title>Knots by Wikipedia</title>
+        </book>
+        <wordCount>552</wordCount>
+    </item>
+    <item>
+      <title>Beer knot</title>
+      <link>/content/wikipedia_en_knots_maxi_2026-10/Beer_knot</link>
+        <description>...<b>water</b> knot, it has the advantages of a higher strength,[1] smaller profile, and a cleaner appearance due to the lack of free-hanging tails. However, the beer knot can be more difficult to tie than the <b>water</b> knot, and one of the tails is hidden from view, making safety checks for adequate tail length more difficult. Testing by PMI in 1995 showed that the beer knot preserves about 80% of the strength of the webbing.[1] The beer knot was introduced to the National Speleological Society in the 1980s......</description>
+        <book>
+          <title>Knots by Wikipedia</title>
+        </book>
+        <wordCount>529</wordCount>
+    </item>
+  </channel>
+</rss>

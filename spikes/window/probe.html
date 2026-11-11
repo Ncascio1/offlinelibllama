@@ -1,0 +1,36 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Spike probe</title>
+<body style="font-family:Segoe UI,sans-serif;background:#e8ece9;color:#14202b">
+<h1>Offline Library spike</h1>
+<iframe id="f" style="width:100%;height:500px;border:1px solid #1f4e79"></iframe>
+<script>
+// Each probe returns a plain value so the main process can log it.
+async function runProbes(kport) {
+  const r = {};
+  // 1. Outside internet must be blocked.
+  try { await fetch('https://example.com/'); r.externalFetch = 'NOT BLOCKED (bad)'; }
+  catch { r.externalFetch = 'blocked (good)'; }
+  // 2. Localhost Kiwix must work.
+  try { const x = await fetch(`http://127.0.0.1:${kport}/catalog/v2/entries`); r.kiwixFetch = x.status; }
+  catch (e) { r.kiwixFetch = 'failed ' + e; }
+  // 3. Graphics: maps need WebGL.
+  const c = document.createElement('canvas');
+  const gl = c.getContext('webgl2') || c.getContext('webgl');
+  r.webgl = gl ? (gl instanceof WebGL2RenderingContext ? 'webgl2' : 'webgl1') : 'none';
+  if (gl) { const d = gl.getExtension('WEBGL_debug_renderer_info');
+            r.renderer = d ? gl.getParameter(d.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER); }
+  // 4. Web workers (MapLibre uses them).
+  r.worker = await new Promise(res => {
+    try { const w = new Worker(URL.createObjectURL(new Blob(['postMessage(6*7)'])));
+          w.onmessage = e => res(e.data === 42 ? 'ok' : 'odd'); w.onerror = () => res('error');
+          setTimeout(() => res('timeout'), 3000); } catch (e) { res('error ' + e); }
+  });
+  // 5. Kiwix article inside an iframe; its external images/links should be blocked.
+  await new Promise(res => { const f = document.getElementById('f'); f.onload = res;
+    f.src = `http://127.0.0.1:${kport}/content/wikipedia_en_knots_maxi_2026-10/Bowline`; setTimeout(res, 8000); });
+  r.iframeTitle = await new Promise(res => { try { res(document.getElementById('f').contentDocument?.title ?? '(cross-origin)'); } catch { res('(cross-origin)'); } });
+  r.serviceWorkerApiInIframe = 'n/a';
+  return r;
+}
+</script>

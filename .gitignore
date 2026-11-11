@@ -1,0 +1,8 @@
+# Large or downloaded files never go into git
+*.zim
+*.gguf
+*.zip
+spikes/launcher/Start.exe
+node_modules/
+_system/data/
+_system/logs/
