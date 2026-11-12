@@ -20,6 +20,8 @@ const { localFetch } = require('../local-http'); // not Node's fetch: see local-
 const RRF_K = 10;               // rank-fusion constant: higher = flatter
 const MAX_ARTICLE_WORDS = 6000; // very long articles: only the first part is used
 const MAX_PASSAGES_PER_ARTICLE = 3;
+// Per request. 15 s lost whole books on a first search from a USB stick (Windows test).
+const REQUEST_TIMEOUT_MS = 30000;
 
 // "How do I ...?" questions: the answer usually sits in a section with one of these names.
 const HOW_TO_QUESTION = /^\s*(how (do|can|should|to|would)|what('s| is) the (best )?way|steps|instructions)\b|\bhow to\b/i;
@@ -40,14 +42,14 @@ class KiwixRetriever {
   }
 
   async get(path, signal, asJson = false) {
-    const res = await this.fetch(this.baseUrl + path, { signal: anySignal(signal, 15000) });
+    const res = await this.fetch(this.baseUrl + path, { signal: anySignal(signal, REQUEST_TIMEOUT_MS) });
     if (!res.ok) { discardBody(res); throw new Error(`HTTP ${res.status} for ${path.slice(0, 80)}`); }
     return asJson ? res.json() : res.text();
   }
 
   // Read an article, following redirects (alternate names). Returns the final address too.
   async getArticle(path, signal) {
-    const res = await this.fetch(this.baseUrl + path, { signal: anySignal(signal, 15000) });
+    const res = await this.fetch(this.baseUrl + path, { signal: anySignal(signal, REQUEST_TIMEOUT_MS) });
     if (!res.ok) { discardBody(res); throw new Error(`HTTP ${res.status} for ${path.slice(0, 80)}`); }
     const finalPath = res.url && res.url.startsWith(this.baseUrl) ? res.url.slice(this.baseUrl.length) : path;
     // Only web pages can be read as text. PDFs, videos and pictures are skipped

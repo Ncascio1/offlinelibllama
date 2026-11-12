@@ -9,6 +9,11 @@
 const { parseSearchXml, decodeEntities } = require('./kiwix-catalog');
 const { localFetch } = require('./local-http'); // not Node's fetch: see local-http.js
 
+// How long to wait for one book. The very first search in full Wikipedia from a USB stick
+// took about 20 s on Windows; with a 20 s limit that book's results were lost entirely.
+// The page says "Searching…" meanwhile, so a longer wait beats an empty answer.
+const REQUEST_TIMEOUT_MS = 45000;
+
 const PER_BOOK = 25;
 
 /**
@@ -24,7 +29,7 @@ async function searchLibrary({ baseUrl, books, query, fetchImpl = localFetch }) 
   const textBooks = books.filter(b => !b.isMap);
   if (!q || !textBooks.length) return { titleMatches: [], results: [], total: 0 };
   const get = async (path, json) => {
-    const res = await fetchImpl(baseUrl + path, { signal: AbortSignal.timeout(20000) });
+    const res = await fetchImpl(baseUrl + path, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
     if (!res.ok) {
       // Close the unread download (a half-open one can crash Node's fetch on Windows).
       try { if (res.body && res.body.cancel) res.body.cancel().catch(() => {}); } catch {}

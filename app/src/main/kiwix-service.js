@@ -46,6 +46,9 @@ class KiwixService {
       '--skipInvalid',                    // one damaged book must not stop the others
       '--nolibrarybutton',                // our own top bar has the Library button
       '--attachToProcess', String(process.pid), // quit if the app disappears
+      // Default is 4. One search asks every book at once (2 requests per book), so with 4
+      // the quick small books waited behind slow Wikipedia reads (measured on Windows, USB stick).
+      '--threads', '8',
       ...this.zims,
     ];
     this.engine = new EngineProcess('kiwix', this.exe, args, this.log);
@@ -68,6 +71,22 @@ class KiwixService {
       }
     }
     throw Object.assign(new Error(`kiwix-serve did not answer within ${this.startSeconds} s`), { code: 'timeout' });
+  }
+
+  // Open each book's search index in the background, one book at a time, biggest first.
+  // The first search in a big book reads a lot from the drive (up to 20 s from a USB
+  // stick, measured with full Wikipedia); doing it now means the customer's first search
+  // is quick. Errors don't matter here: it is only a head start.
+  async warmUp() {
+    const started = Date.now();
+    const books = this.books.filter(b => !b.isMap).sort((a, b) => (b.articleCount || 0) - (a.articleCount || 0));
+    for (const b of books) {
+      if (!this.engine || !this.engine.running) return;
+      const urls = [`${this.baseUrl}/suggest?content=${encodeURIComponent(b.slug)}&term=water&count=1`];
+      if (b.hasFullTextIndex) urls.unshift(`${this.baseUrl}/search?books.id=${encodeURIComponent(b.id)}&format=xml&pageLength=1&pattern=water`);
+      for (const url of urls) { try { await fetchText(url, 60000); } catch { /* ignore */ } }
+    }
+    this.log.info(`library warm-up done after ${Date.now() - started} ms`);
   }
 
   stop() { return this.engine ? this.engine.stop() : Promise.resolve(); }

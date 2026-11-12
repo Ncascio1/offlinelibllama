@@ -120,10 +120,18 @@ Not tested: a write-protected drive, a slow USB 2 stick, unplugging while runnin
    (`app/src/main/local-http.js`); unread downloads are always closed. After the fix, 6 questions in a row
    including a follow-up ran without a crash. 5 new unit tests.
 2. **Result counts showed 0 (fixed).** Kiwix writes "323,837" with a comma; the app read that as 0. 1 new unit test.
-3. **First search of a word is slow from the USB stick (not fixed, needs a decision).** The first search for a new
-   word took 4 to 20 s; repeats under 1 s. Searches are cut off after 20 s, so on a cold start "tourniquet" and
-   "snake bite" first returned **no results at all**. Ideas: show results book by book as they arrive, a longer
-   limit, fewer requests at once.
+3. **First search of a word was slow from the USB stick (improved).** The first search for a new word took 4 to
+   20 s; repeats under 1 s. Searches were cut off after 20 s, so on a cold start "tourniquet" and "snake bite"
+   first returned **no results at all**. Measured cause: Kiwix answers only 4 requests at a time, while one search
+   sends 2 per book, so small books queued behind slow Wikipedia reads; and the first read of each book's index is
+   slow from USB. Changes: Kiwix runs with 8 threads; right after the library is ready the app opens every book's
+   index in the background, one book at a time, biggest first ("warm-up", took 26 s); the wait per book is now
+   45 s (30 s for the AI's searches) so a slow book still returns results. Re-test from the stick with words not
+   searched before: every search returned results, most in 1.6 to 4.8 s, worst 18 s ("radio", Wikipedia title
+   lookup). Not tested: a truly cold stick (it could not be ejected while this session used it). 2 new unit tests.
+   Possible later improvement: show results book by book as they arrive.
+   Also seen: library ready took 34 to 44 s from the stick when the AI loads its 2 GB file at the same moment
+   (7 s with the app on C:). Idea for later: start the AI a few seconds after the library.
 4. **AI answers take 45 to 80 s (needs a decision).** Reading the library: 5 to 41 s (USB stick, cold). The AI
    reading the passages: about 25 s (59 tokens/s; writing 11 tokens/s). Using fewer CPU threads did not help
    (default is fastest). Re-measure with the PC idle. A graphics-card build of llama.cpp could be much faster on

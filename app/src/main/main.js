@@ -269,6 +269,7 @@ async function startEngines() {
     retriever = new KiwixRetriever({ baseUrl: kiwix.baseUrl, books, log });
     log.info(`library ready after ${Date.now() - START_TIME} ms`);
     broadcast();
+    kiwix.warmUp().catch(() => {}); // background head start for the first search
     kiwix.engine.onceExit(info => {
       if (info.expected || shuttingDown) return;
       setLibrary('failed', messages.library.stopped);
