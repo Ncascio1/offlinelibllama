@@ -122,6 +122,18 @@ First start from the new layout, close to a real first plug-in: window 0.47 s, *
 2 min 39 s**, warm-up finished after 99 s; search worked, closing left nothing running. The warm-up and the AI
 both read from the stick during startup and slow each other down; worth tuning (for example: warm up only after
 the AI is ready, or start the AI a few seconds after the library).
+### Next: speed up startup (in progress, 2026-11-12)
+Facts so far: the owner's stick reads about **145 MB/s** for one big file and about **900 small (64 KB) reads per
+second** (one reader, data never read before). So the 2 GB AI file alone should load in roughly 15 s, yet in the
+real start the AI took 2 min 39 s and the library 65 s, while Kiwix, the AI and the warm-up all read the stick at once.
+The stick could not be ejected for a true cold test because the Claude session had been started inside `D:\Proj`.
+Plan for the next session (started in `C:\Users\nicho\OfflineLibrary-dev\offlinelibllama`, stick freshly replugged):
+1. Cold-measure each engine alone: `tests\manual\cold-start-measure.ps1 -Drive D:` (Kiwix, then the AI);
+   replug, then `-SkipKiwix -LlamaExtra '--no-mmap'` to compare the two ways the AI can load its file.
+2. Change the start order in `app/src/main/main.js`: Library first, AI once the library is ready, warm-up only
+   after the AI is ready (or paused while it loads). Use `--no-mmap` if step 1 shows it is faster.
+3. Replug, then a cold start of the whole app from the stick; compare with 65 s / 2 min 39 s.
+
 Still missing for customers: `Start.exe` at the top level (today they would have to open
 `_system\app\OfflineLibrary.exe`). It needs a C compiler to build from `spikes/launcher/start.c` (Phase 5).
 Not tested: a write-protected drive, a slow USB 2 stick, unplugging while running, other PCs (4 and 8 GB, Windows 10).
