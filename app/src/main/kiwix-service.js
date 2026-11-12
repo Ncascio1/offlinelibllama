@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { EngineProcess } = require('./processes');
 const { parseCatalog } = require('./kiwix-catalog');
+const { localFetch } = require('./local-http'); // not Node's fetch: see local-http.js
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -21,8 +22,8 @@ function findZimFiles(libraryDir) {
 }
 
 async function fetchText(url, timeoutMs = 5000) {
-  const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const res = await localFetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+  if (!res.ok) { res.body.cancel(); throw new Error(`HTTP ${res.status}`); }
   return res.text();
 }
 

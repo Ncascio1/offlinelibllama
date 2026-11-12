@@ -89,6 +89,46 @@ must still be read with the sources, which is what the on-screen notice says.
    I would use them as a test set so answer quality can be checked after every change.
 4. Later, for real-world tuning: which Wikipedia ZIM (and other books) you ship, so I can test with a large one.
 
+## Windows test results (2026-11-11, owner's PC, local session)
+PC: Windows 11 Home (build 26200), Intel i7-12650H (10 cores / 16 threads), 15.7 GB memory, on mains power.
+**The PC was also busy with other heavy work during these tests, so AI speeds are pessimistic.**
+Test folder: `C:\Users\nicho\Offline Test Drive` (NTFS, path with spaces). Books were read from the owner's
+USB stick (D:, exFAT, USB) through a folder link, so book speed = USB stick speed. Model: a copy of the owner's
+Llama 3.2 3B Instruct Q4_K_M (confirmed from the file's own header; its SHA-256 `6C1A2B41…28FF` differs from the
+cloud copy, most likely a different uploader; behaves as expected).
+Engines: Electron 44.10.0, kiwix-tools 3.8.1, llama.cpp b12239 (all fingerprints checked).
+Books: 9 (Wikipedia nopic 52.7 GB, WikiMed, Appropedia, iFixit, military medicine, 3 zimgit guides, US map 34.9 GB).
+
+| Step | Result |
+|---|---|
+| 1. Starts | PASS: window after 0.26 to 0.44 s. Library and Maps work (US map drawn in 2.8 s). No console window: *owner to confirm visually* |
+| 2. Full Wikipedia | Library ready after 7.4 to 9.4 s with all 9 books. Search: see problems below |
+| 3. AI | AI ready after 44 s (first start), 6 s (second start). Answers grounded with correct sources; "2030 World Cup" correctly not covered. Slow, see below |
+| 4. Clean shutdown | PASS for "End task" on the app: Windows stopped Kiwix and the AI by itself (the "job" safety net). Next start's leftover check behaved correctly. Shut down button and closing the window: *owner to check* |
+| 5. No writes outside the drive | PASS: nothing new in %APPDATA% or %LOCALAPPDATA% |
+| 6. Firewall | PASS: no firewall rules created for our programs (no prompt) |
+| 7. Antivirus | PASS: Windows Defender custom scan of `_system` found nothing |
+| 8. Whole app on USB stick | Not done yet (see "What I need from you") |
+
+### Problems found on Windows, and what was done
+1. **App crash when asking the AI (fixed).** "A JavaScript error occurred in the main process ... assert(!this.paused)".
+   Node's built-in fetch crashes when Kiwix closes a connection while several big articles are being read at once.
+   It never showed with the small test books. Fix: Kiwix is now read with Node's older `http` module
+   (`app/src/main/local-http.js`); unread downloads are always closed. After the fix, 6 questions in a row
+   including a follow-up ran without a crash. 5 new unit tests.
+2. **Result counts showed 0 (fixed).** Kiwix writes "323,837" with a comma; the app read that as 0. 1 new unit test.
+3. **First search of a word is slow from the USB stick (not fixed, needs a decision).** The first search for a new
+   word took 4 to 20 s; repeats under 1 s. Searches are cut off after 20 s, so on a cold start "tourniquet" and
+   "snake bite" first returned **no results at all**. Ideas: show results book by book as they arrive, a longer
+   limit, fewer requests at once.
+4. **AI answers take 45 to 80 s (needs a decision).** Reading the library: 5 to 41 s (USB stick, cold). The AI
+   reading the passages: about 25 s (59 tokens/s; writing 11 tokens/s). Using fewer CPU threads did not help
+   (default is fastest). Re-measure with the PC idle. A graphics-card build of llama.cpp could be much faster on
+   PCs that have one, but must fall back safely on PCs that don't.
+5. Answer quality: mostly good and cited. Weak case: "snake bite" gave a thin answer (wash, antivenom).
+
+Unit tests on Windows: 70 of 70 pass (run with the app's own Electron as Node; Node is not installed on this PC).
+
 ## Testing on your PC (status)
 Your PC's folders ("Proj" on the USB-C drive and "OFFLINE PREP" on C:) appear in Remote Control, but your computer
 does not offer them to cloud sessions (same result on both drives, so the USB-C drive is not the cause; most likely the

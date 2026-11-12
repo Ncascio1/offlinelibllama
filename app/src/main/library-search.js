@@ -7,6 +7,7 @@
 //    is searched on its own and the lists are merged (like the AI's retriever).
 'use strict';
 const { parseSearchXml, decodeEntities } = require('./kiwix-catalog');
+const { localFetch } = require('./local-http'); // not Node's fetch: see local-http.js
 
 const PER_BOOK = 25;
 
@@ -18,13 +19,17 @@ const PER_BOOK = 25;
  * @returns {Promise<{ titleMatches: Array, results: Array, total: number }>}
  *   each item: { title, bookTitle, slug, path, snippet }
  */
-async function searchLibrary({ baseUrl, books, query, fetchImpl = fetch }) {
+async function searchLibrary({ baseUrl, books, query, fetchImpl = localFetch }) {
   const q = String(query || '').trim().slice(0, 200);
   const textBooks = books.filter(b => !b.isMap);
   if (!q || !textBooks.length) return { titleMatches: [], results: [], total: 0 };
   const get = async (path, json) => {
     const res = await fetchImpl(baseUrl + path, { signal: AbortSignal.timeout(20000) });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) {
+      // Close the unread download (a half-open one can crash Node's fetch on Windows).
+      try { if (res.body && res.body.cancel) res.body.cancel().catch(() => {}); } catch {}
+      throw new Error(`HTTP ${res.status}`);
+    }
     return json ? res.json() : res.text();
   };
 

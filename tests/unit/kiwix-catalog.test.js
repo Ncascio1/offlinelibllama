@@ -57,6 +57,11 @@ test('search XML: results with title, link, slug, snippet and book title', () =>
   assert.ok(!r.items[0].snippet.includes('<b>'), 'bold tags removed from snippet');
 });
 
+test('search XML: big counts with thousands separators (seen with full Wikipedia on Windows)', () => {
+  const xml = fx('search-water-2books.xml').replace(/<opensearch:totalResults>[^<]*</, '<opensearch:totalResults>323,837<');
+  assert.strictEqual(parseSearchXml(xml).total, 323837);
+});
+
 test('catalog: empty or broken input gives an empty list, not a crash', () => {
   assert.deepStrictEqual(parseCatalog(''), []);
   assert.deepStrictEqual(parseCatalog('<feed><entry><title>no id</title></entry></feed>'), []);

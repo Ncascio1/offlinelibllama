@@ -73,7 +73,8 @@ function parseCatalog(xml) {
 
 /** Parse /search?...&format=xml results (used by the AI in Phase 3). */
 function parseSearchXml(xml) {
-  const total = Number(tagText(xml, 'opensearch:totalResults')) || 0;
+  // Kiwix writes big counts with thousands separators ("323,837"), so keep only the digits.
+  const total = Number(String(tagText(xml, 'opensearch:totalResults') || '').replace(/[^0-9]/g, '')) || 0;
   const items = (xml.match(/<item>[\s\S]*?<\/item>/g) || []).map(it => {
     const link = tagText(it, 'link');
     const slug = (link.match(/^\/content\/([^/]+)\//) || [])[1] || '';

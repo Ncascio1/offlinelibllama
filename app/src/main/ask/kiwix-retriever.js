@@ -15,6 +15,7 @@ const { parseSearchXml, decodeEntities } = require('../kiwix-catalog');
 const { extractText } = require('./text-extract');
 const { splitPassages, rankPassages } = require('./passages');
 const { fallbackKeywords } = require('./keywords');
+const { localFetch } = require('../local-http'); // not Node's fetch: see local-http.js
 
 const RRF_K = 10;               // rank-fusion constant: higher = flatter
 const MAX_ARTICLE_WORDS = 6000; // very long articles: only the first part is used
@@ -30,7 +31,7 @@ class KiwixRetriever {
    * @param {string} o.baseUrl   e.g. http://127.0.0.1:12345
    * @param {Array}  o.books     catalog books (id, slug, title, isMap, hasFullTextIndex)
    */
-  constructor({ baseUrl, books, log, maxArticles = 10, fetchImpl = fetch }) {
+  constructor({ baseUrl, books, log, maxArticles = 10, fetchImpl = localFetch }) {
     this.baseUrl = baseUrl;
     this.books = books.filter(b => !b.isMap);
     this.log = log;
@@ -40,19 +41,19 @@ class KiwixRetriever {
 
   async get(path, signal, asJson = false) {
     const res = await this.fetch(this.baseUrl + path, { signal: anySignal(signal, 15000) });
-    if (!res.ok) throw new Error(`HTTP ${res.status} for ${path.slice(0, 80)}`);
+    if (!res.ok) { discardBody(res); throw new Error(`HTTP ${res.status} for ${path.slice(0, 80)}`); }
     return asJson ? res.json() : res.text();
   }
 
   // Read an article, following redirects (alternate names). Returns the final address too.
   async getArticle(path, signal) {
     const res = await this.fetch(this.baseUrl + path, { signal: anySignal(signal, 15000) });
-    if (!res.ok) throw new Error(`HTTP ${res.status} for ${path.slice(0, 80)}`);
+    if (!res.ok) { discardBody(res); throw new Error(`HTTP ${res.status} for ${path.slice(0, 80)}`); }
     const finalPath = res.url && res.url.startsWith(this.baseUrl) ? res.url.slice(this.baseUrl.length) : path;
     // Only web pages can be read as text. PDFs, videos and pictures are skipped
     // (otherwise raw file data would reach the AI as if it were text).
     const type = (res.headers && res.headers.get && res.headers.get('content-type')) || 'text/html';
-    if (!/html|text\/plain/i.test(type)) throw Object.assign(new Error(`not a web page (${type.split(';')[0]})`), { skip: true });
+    if (!/html|text\/plain/i.test(type)) { discardBody(res); throw Object.assign(new Error(`not a web page (${type.split(';')[0]})`), { skip: true }); }
     return { html: await res.text(), finalLink: normLink(finalPath) };
   }
 
@@ -168,6 +169,13 @@ function truncateWords(text, n) { return text.split(/(\s+)/).slice(0, n * 2).joi
 function anySignal(signal, ms) {
   const t = AbortSignal.timeout(ms);
   return signal ? AbortSignal.any([signal, t]) : t;
+}
+
+// A download we decided not to read (an error page, a PDF, a video) must still be
+// closed. Left half-open, Node's built-in fetch can crash the whole app when Kiwix
+// later closes the connection (seen on Windows: "assert(!this.paused)").
+function discardBody(res) {
+  try { if (res.body && res.body.cancel) res.body.cancel().catch(() => {}); } catch {}
 }
 
 module.exports = { KiwixRetriever };
