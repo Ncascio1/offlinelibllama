@@ -111,6 +111,19 @@ Books: 9 (Wikipedia nopic 52.7 GB, WikiMed, Appropedia, iFixit, military medicin
 | 8. Whole app on USB stick | PASS. Everything on the owner's USB stick (D:, exFAT, folder `D:\Proj` as the drive root): window 0.97 s, AI ready 25 s, library ready 34.5 s (both loading from the same stick at once, so slower than from C:). Search and AI work; AI answers 19 to 30 s (first words after about 13 s, PC less busy). Closing the window: nothing left running. **Different drive letter:** the same folder as a temporary `X:` drive (Windows `subst`, books at `X:\library`): starts, finds everything at `X:\`, searches, closes cleanly |
 
 Owner confirmed by eye: no black console window and no firewall prompt at any time.
+
+### The owner's stick now has the customer layout (2026-11-12)
+`D:\` top level: `START-HERE.html`, `_system\`, `library\` (9 books), `models\small.gguf`. Deleted (not used by
+the app): the Kiwix desktop app, the full llama.cpp download, the embedded Python, test logs. Moved to the PC at
+`C:\Users\nicho\OfflineLibrary-dev\`: this project (`offlinelibllama`) and `downloads\` (the Electron and
+kiwix-tools zips needed to build drives, and the old prototype kit). The empty-of-use folder `D:\Proj` (a duplicate
+project copy) is left for the owner to delete.
+First start from the new layout, close to a real first plug-in: window 0.47 s, **library ready 65 s, AI ready
+2 min 39 s**, warm-up finished after 99 s; search worked, closing left nothing running. The warm-up and the AI
+both read from the stick during startup and slow each other down; worth tuning (for example: warm up only after
+the AI is ready, or start the AI a few seconds after the library).
+Still missing for customers: `Start.exe` at the top level (today they would have to open
+`_system\app\OfflineLibrary.exe`). It needs a C compiler to build from `spikes/launcher/start.c` (Phase 5).
 Not tested: a write-protected drive, a slow USB 2 stick, unplugging while running, other PCs (4 and 8 GB, Windows 10).
 
 ### Problems found on Windows, and what was done
