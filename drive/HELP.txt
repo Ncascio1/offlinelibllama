@@ -1,0 +1,134 @@
+﻿HELP  -  Offline Library
+========================
+
+This drive holds a library of books (including Wikipedia), street maps,
+and an AI helper that answers questions from the books. Everything works
+without the internet. Nothing is installed on your computer.
+
+
+TO OPEN IT
+----------
+1. Plug the drive into a Windows computer (Windows 10 or 11).
+2. Open the drive in File Explorer and double-click "Start"
+   (the blue picture with a yellow book).
+3. The Offline Library window opens in a few seconds. The books are
+   ready after about half a minute. The AI needs longer: a minute or
+   more, and several minutes on older computers. You can read and use
+   the maps meanwhile.
+
+If you double-click Start while the library is already open, the open
+window comes to the front.
+
+The same guide is inside the program: click the Help button.
+
+
+THE BUTTONS AT THE TOP
+----------------------
+Home ........... the start page.
+Back, Forward .. the arrows: the page you were on before, and back again.
+Library ........ all the books, and a box to "Search all books" at once.
+Maps ........... the street maps on this drive.
+Ask ............ ask the AI a question.
+Help ........... this guide.
+Shut down ...... closes everything (see "To finish" below).
+
+A small light next to the buttons shows whether the AI is starting,
+ready, or not available. Point at it with the mouse to see why.
+
+
+LIBRARY
+-------
+- Click a book to open it. Each book has its own search box at the top.
+- To look in every book at once, use "Search all books" on the Library
+  page. The first search can take a few seconds; later ones are quicker.
+- Some books contain guides you can print, and videos you can play.
+
+
+MAPS
+----
+- Click a map to open it. Drag to move. Use the mouse wheel, or the
+  + and - buttons, to zoom.
+- Use the map's search box to find a town or street.
+- Some very old computers cannot draw the maps. The Maps page then says
+  so. The Library and the AI still work.
+
+
+ASK THE AI
+----------
+- Click Ask, type a question in plain words, and press Enter.
+  For example: how do I purify water?
+- The AI searches the books, then writes an answer. A full answer can
+  take one or two minutes.
+- Each answer lists its sources as numbers. Click a source to read the
+  article it came from.
+- You can ask a follow-up question. "New question" starts again.
+  "Stop" stops a long answer.
+- If the books do not cover your question, the AI says so.
+
+THE AI CAN MAKE MISTAKES. IT IS NOT A DOCTOR. For anything about health
+or safety, read the sources it shows, and get professional help
+whenever you can.
+
+
+BIGGER OR SMALLER TEXT
+----------------------
+Hold Ctrl and press + for bigger text, Ctrl and - for smaller,
+and Ctrl and 0 to go back to normal.
+
+
+TO FINISH
+---------
+1. Click "Shut down", then "Yes". Or close the window with the X in its
+   corner.
+2. Wait until the window has closed.
+3. Remove the drive safely: click the drive picture near the clock,
+   choose "Eject", then unplug it.
+
+
+IF SOMETHING GOES WRONG
+-----------------------
+Nothing happens when you double-click Start:
+  Wait 15 seconds; slow drives take longer. Then double-click it once
+  more.
+
+"Windows protected your PC":
+  Click "More info", then "Run anyway".
+
+Your antivirus program blocks or removes Start:
+  This is a false alarm; the program on this drive does not use the
+  internet. Choose to allow or restore it in your antivirus program, or
+  contact the person who gave you this drive.
+
+The AI is not available:
+  The light and the Ask page say why. The most common reason is a
+  computer with less than 6 GB of memory. The Library and Maps still
+  work.
+
+Everything is slow:
+  Plug the drive into a faster port. On many computers the faster ports
+  are blue inside, or marked "SS".
+
+The drive was unplugged while in use:
+  Plug it back in, close the window, and double-click Start again.
+
+A message says files are missing or the drive may be damaged:
+  Contact the person who gave you this drive.
+
+
+GOOD TO KNOW
+------------
+- Private: nothing you read or ask leaves your computer, and your
+  questions are not saved.
+- Keep a second copy of this drive somewhere safe. Any drive can fail.
+
+
+CREDITS
+-------
+The books and maps come from open projects and keep their own licences.
+Wikipedia articles are by Wikipedia contributors, under the Creative
+Commons Attribution-ShareAlike licence. Map data (c) OpenStreetMap
+contributors, under the Open Database License. The library is served by
+Kiwix (GNU General Public License version 3). The AI runs on llama.cpp
+(MIT licence) and uses Llama 3.2, licensed under the Llama 3.2 Community
+License, (c) Meta Platforms, Inc. Built with Llama. The window uses
+Electron and Chromium (MIT and BSD-style licences).

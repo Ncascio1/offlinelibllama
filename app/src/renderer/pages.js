@@ -104,7 +104,6 @@ const PAGES = {
       'library-stopped': ['The library stopped', 'If you unplugged the drive, plug it back in, then close the program and start it again.'],
       'library-not-ready': ['The library is not ready yet', 'Wait a moment, then try again from the Library button.'],
       'page-crashed': ['This page stopped working', 'Use the Back button, or the Home button, to continue.'],
-      'no-help': ['The guide is missing', 'The file START-HERE.html should be on this drive. Contact the person who gave you this drive.'],
     };
     const [title, text] = M[params.get('kind')] || ['Something went wrong', 'Use the Home button to continue.'];
     return [h('h1', {}, title), h('p', {}, text)];

@@ -185,3 +185,22 @@ the checks are a safety net for the cases retrieval can't fix.
   searched by title only. Letting the AI read PDFs would need a PDF text reader (for example
   Mozilla's pdf.js, Apache 2.0). Not added: it is a new dependency, needs your approval, and
   should be judged after the Windows test with the real books.
+
+## D11. Start.exe is built in C# with the compiler that comes with Windows
+**Decision:** the top-level `Start.exe` (opens `_system\app\OfflineLibrary.exe`, then exits) is `launcher/Start.cs`,
+built by `launcher/build-start.ps1` with `csc.exe` from .NET Framework 4, which is part of every Windows 10 and 11.
+**Why:** no C compiler is installed on the owner's PC, and this needs no download. The result is 10 KB, shows no
+console window, works from any drive letter and path, and needs nothing installed on customers' PCs
+(.NET Framework 4 is built into Windows 10 and 11). The earlier C version (`spikes/launcher/start.c`) does the same.
+Icon: `launcher/start.ico` (blue square, yellow book), drawn by `launcher/make-icon.ps1`.
+**Risk found (2026-11-12):** Malwarebytes quarantined `Start.exe` the first time it ran on the owner's PC
+(the owner allowed it). Windows Defender did not flag it. Small unsigned programs that only start another program
+are a common false alarm. Options: report it to Malwarebytes as a false positive (free); code signing later (paid).
+The guide tells customers what to do if their antivirus blocks Start.
+
+## D12. The guide on the drive is HELP.txt; the Help button shows a copy built into the app
+**Decision (owner, 2026-11-12):** the top level of the drive has `HELP.txt` instead of `START-HERE.html`.
+**Why:** an .html file opened from File Explorer starts the customer's web browser; a .txt file opens in Notepad,
+which every Windows PC has. "HELP" avoids confusion with "Start". The app's Help button shows the same guide,
+formatted, from `app/src/renderer/help.html` (part of the app, so it is never missing). The two files must be
+changed together. This replaces "START-HERE.html" in the drive layout of the project brief.

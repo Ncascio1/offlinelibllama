@@ -6,3 +6,4 @@ spikes/launcher/Start.exe
 node_modules/
 _system/data/
 _system/logs/
+launcher/out/

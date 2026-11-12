@@ -1,8 +1,8 @@
 // The private "app://" address for our own pages.
 //
 //   app://local/<file>        the app's pages (src/renderer/)
-//   app://drive/START-HERE.html and app://drive/LICENSES/<file>
-//                             the customer guide and licence texts on the drive
+//   app://drive/LICENSES/<file>  the licence texts on the drive
+// The Help page (the customer guide) is part of the app: app://local/help.html.
 //
 // Files are read straight from disk; nothing else on the PC can be reached,
 // and "../" tricks are refused.
@@ -42,7 +42,6 @@ function resolveAppUrl(url, { rendererDir, paths }) {
   const rel = decodeURIComponent(u.pathname).replace(/^\/+/, '');
   if (u.host === 'local') return safeJoin(rendererDir, rel || 'home.html');
   if (u.host === 'drive' && paths) {
-    if (rel === 'START-HERE.html') return paths.startHere;
     if (rel.startsWith('LICENSES/')) return safeJoin(paths.licenses, rel.slice('LICENSES/'.length));
   }
   return null;

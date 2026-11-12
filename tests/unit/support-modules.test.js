@@ -70,14 +70,15 @@ test('stale engines: missing or broken pids.json is fine', async () => {
 
 // ---- app:// addresses ----
 test('app:// pages map to files inside the app only', () => {
-  const opts = { rendererDir: '/app/renderer', paths: { startHere: '/drive/START-HERE.html', licenses: '/drive/LICENSES' } };
+  const opts = { rendererDir: '/app/renderer', paths: { licenses: '/drive/LICENSES' } };
   assert.strictEqual(resolveAppUrl('app://local/home.html', opts), path.resolve('/app/renderer/home.html'));
-  assert.strictEqual(resolveAppUrl('app://drive/START-HERE.html', opts), '/drive/START-HERE.html');
+  assert.strictEqual(resolveAppUrl('app://local/help.html', opts), path.resolve('/app/renderer/help.html'));
+  assert.strictEqual(resolveAppUrl('app://drive/START-HERE.html', opts), null); // the guide now lives inside the app
   assert.strictEqual(resolveAppUrl('app://drive/LICENSES/kiwix.txt', opts), path.resolve('/drive/LICENSES/kiwix.txt'));
   // Tricks that try to climb out of the app folder: the result must be refused (null)
   // or still land inside the allowed folders (where the file simply won't exist).
   const inside = f => f === null || f.startsWith(path.resolve('/app/renderer') + path.sep) ||
-                      f.startsWith(path.resolve('/drive/LICENSES') + path.sep) || f === '/drive/START-HERE.html';
+                      f.startsWith(path.resolve('/drive/LICENSES') + path.sep);
   for (const bad of ['app://local/../../etc/passwd', 'app://local/%2e%2e/%2e%2e/secret', 'app://local/..%2f..%2fsecret',
                      'app://local/..%5c..%5csecret', 'app://drive/LICENSES/..%2f..%2fmodels/small.gguf'])
     assert.ok(inside(resolveAppUrl(bad, opts)), `${bad} -> ${resolveAppUrl(bad, opts)}`);

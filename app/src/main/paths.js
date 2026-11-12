@@ -41,7 +41,6 @@ function drivePaths(root) {
     kiwixExe: path.join(sys, 'kiwix', 'kiwix-serve' + exe),
     llamaExe: path.join(sys, 'llama', 'llama-server' + exe),
     configFile: path.join(sys, 'config.json'),
-    startHere: path.join(root, 'START-HERE.html'),
     licenses: path.join(root, 'LICENSES'),
     // These two may move to the temp folder if the drive is read-only:
     data: path.join(sys, 'data'),

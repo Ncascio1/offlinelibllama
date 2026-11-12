@@ -156,8 +156,25 @@ Open questions: the AI took 37 s after the library was ready, against 18 s alone
 for a while after it answers; the first search right after startup is still slow (35 s). Ideas for later: show
 search results book by book as they arrive; measure `--load-mode dio`.
 
-Still missing for customers: `Start.exe` at the top level (today they would have to open
-`_system\app\OfflineLibrary.exe`). It needs a C compiler to build from `spikes/launcher/start.c` (Phase 5).
+### Start file and customer guide (2026-11-12)
+- **`Start.exe` is now at the top of the stick** (blue icon with a yellow book). Built from `launcher/Start.cs` by
+  `launcher\build-start.ps1` with the C# compiler built into Windows (decision D11). Tested from `D:\`: double-click →
+  app window after 0.36 s; closing left nothing running.
+  **Malwarebytes quarantined it on first run** (owner allowed it); Windows Defender did not flag it. See D11.
+- **New customer guide, rewritten.** The old `START-HERE.html` was the prototype's guide and was wrong: it described
+  a black window and the web browser opening, told people to refresh the page and allow a firewall prompt (there is
+  none), and pointed to a LICENSES folder that does not exist yet. The new guide matches the app: own window, top
+  bar buttons, Search all books, maps (search box, + and −, checked on the real US map), Ask with sources, Stop and
+  New question, text size, Shut down and safe eject, what to do if antivirus blocks Start, and credits for
+  Wikipedia, OpenStreetMap, Kiwix, llama.cpp, Llama 3.2 and Electron. No contact line (owner's choice).
+- **Owner's decision: the guide on the drive is `HELP.txt`** (opens in Notepad, no browser needed; named so it is
+  not confused with Start). Plain text, short lines (Notepad on Windows 10 does not wrap long lines), Windows line
+  endings. The app's **Help** button shows the same guide, formatted, from inside the app
+  (`app/src/renderer/help.html`), so it can never be missing. The two must be changed together.
+- Top level of the stick: `Start.exe`, `HELP.txt`, `_system`, `library`, `models`.
+  **To do by the owner:** delete the old `D:\START-HERE.txt` (a safety check stops me deleting files at the top
+  of a drive).
+- Still to do (Phase 5): the `LICENSES/` folder with the full licence texts.
 Not tested: a write-protected drive, a slow USB 2 stick, unplugging while running, other PCs (4 and 8 GB, Windows 10).
 
 ### Problems found on Windows, and what was done

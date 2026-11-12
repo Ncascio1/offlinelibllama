@@ -109,8 +109,8 @@ async function waitFor(fn, ms = 30000, step = 200) {
 
   // Help and Ask
   await bar.click('button[data-cmd=help]');
-  await content.waitForURL(/START-HERE/, { timeout: 10000 });
-  check('Help opens START-HERE.html inside the app', content.url() === 'app://drive/START-HERE.html');
+  await content.waitForURL(/help.html/, { timeout: 10000 });
+  check('Help opens the guide inside the app', content.url() === 'app://local/help.html');
   const helpHasBridge = await content.evaluate(() => typeof window.ol);
   check('the guide page gets no app controls', helpHasBridge === 'undefined');
 

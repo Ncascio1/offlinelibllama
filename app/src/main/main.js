@@ -210,7 +210,7 @@ function handleCommand(name, arg) {
       if (!m) return;
       return go(`${kiwix.baseUrl}/viewer#${m[1]}/${m[2]}`);
     }
-    case 'help': return go(paths && fs.existsSync(paths.startHere) ? 'app://drive/START-HERE.html' : 'app://local/message.html?kind=no-help');
+    case 'help': return go('app://local/help.html'); // the guide is part of the app, so it is never missing
     case 'open-book': {
       const book = kiwix && kiwix.books.find(b => b.slug === arg);
       if (!book || state.library.state !== 'ready') return go('app://local/message.html?kind=library-not-ready');

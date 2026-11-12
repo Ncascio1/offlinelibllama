@@ -16,7 +16,7 @@ Read this whole file before doing anything. Then do the **Phase 0 spikes** and r
 
 1. **Self-contained on the drive.** Everything needed to run is on the USB drive. No installers, no admin rights, no registry writes, no dependency on Python/Node/Java being installed on the customer's PC.
 2. **Own window.** The app opens in its own application window. It must **not** open or depend on the customer's default browser. No visible address bar, no browser chrome. (Back, Forward and Home buttons inside the app are fine and wanted.)
-3. **One double-click.** The top level of the drive shows only: the start file, `START-HERE.html`, and a few folders. No visible console/terminal window when running.
+3. **One double-click.** The top level of the drive shows only: the start file, `HELP.txt` (was `START-HERE.html`, see D12), and a few folders. No visible console/terminal window when running.
 4. **Offline and private.** The app makes **zero** network requests except to `127.0.0.1`. Enforce this in code (block everything else) so a customer never gets surprise traffic and the content is guaranteed offline. No telemetry, no update checks, no analytics.
 5. **Works from any drive letter and any path**, including paths with spaces and non-ASCII characters, and from both exFAT and NTFS volumes. Never hard-code a drive letter or absolute path.
 6. **Never writes to the customer's PC outside the drive**, except what Windows itself requires for temp files. Configure any framework data/cache directories to live on the drive (or in `%TEMP%` if the drive is write-protected). The app **must still run if the drive is read-only.** Avoid heavy or constant writes to the drive (flash wear).
@@ -71,7 +71,7 @@ Pick one, justify in a short note in `docs/decisions.md`, and say what it means 
 ```
 (drive root)
   Start.<ext>             the one thing customers double-click (no console window)
-  START-HERE.html
+  HELP.txt                the customer guide (opens in Notepad; see docs/decisions.md D12)
   _system/                app, kiwix/, llama/, logs/, data/ (all on the drive)
   library/                *.zim (Wikipedia, guides, StreetZim maps, ...)
   models/                 small.gguf  medium.gguf  large.gguf

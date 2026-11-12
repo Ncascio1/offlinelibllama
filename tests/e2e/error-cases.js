@@ -28,7 +28,7 @@ function variant(name, tweak) {
   fs.mkdirSync(path.join(d, 'library')); fs.mkdirSync(path.join(d, 'models'));
   for (const f of fs.readdirSync(path.join(GOOD, 'library'))) fs.symlinkSync(path.join(GOOD, 'library', f), path.join(d, 'library', f));
   for (const f of fs.readdirSync(path.join(GOOD, 'models'))) fs.symlinkSync(path.join(GOOD, 'models', f), path.join(d, 'models', f));
-  fs.copyFileSync(path.join(GOOD, 'START-HERE.html'), path.join(d, 'START-HERE.html'));
+  // (The guide is part of the app now, so the test drive needs no START-HERE file.)
   if (tweak) tweak(d);
   return d;
 }

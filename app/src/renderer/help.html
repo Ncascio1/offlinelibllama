@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Help</title>
+<!-- The Help page inside the app (app://local/help.html). The same guide as plain text is drive/HELP.txt
+     at the top of every drive, for reading in Notepad: change both together.
+     Keep it true to what the app does: check it again after every change to the app. -->
+<style>
+  :root { --paper:#e8ece9; --ink:#14202b; --blue:#1f4e79; --yellow:#f2c230; --line:#9aa8b3; --card:#ffffff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#121a21; --ink:#e8ece9; --blue:#8db8e0; --line:#4a5864; --card:#1b252e; }
+  }
+  html { background: var(--paper); }
+  body { font: 18px/1.6 "Segoe UI", system-ui, sans-serif; max-width: 720px; margin: 0 auto; padding: 24px 16px 48px;
+         color: var(--ink); background: var(--paper); }
+  h1, h2 { font-family: Bahnschrift, "Segoe UI", sans-serif; color: var(--blue); line-height: 1.25; }
+  h1 { font-size: 2em; margin: .2em 0 .3em; }
+  h2 { margin-top: 1.8em; border-top: 2px solid var(--line); padding-top: .6em; }
+  li { margin: .45em 0; }
+  b { font-weight: 600; }
+  kbd { font: inherit; font-size: .9em; border: 1px solid var(--line); border-radius: 4px; padding: 0 .35em; background: var(--card); }
+  .key { border-left: 6px solid var(--yellow); background: var(--card); padding: 12px 16px; border-radius: 4px; }
+  .small { font-size: .9em; }
+  @media print { body { font-size: 13px; } html, body { background: #fff; color: #000; } .key { border: 1px solid #000; } }
+</style>
+</head>
+<body>
+<h1>Help</h1>
+<p>This drive holds a library of books (including Wikipedia), street maps, and an AI helper that answers questions
+from the books. Everything works without the internet. Nothing is installed on your computer.</p>
+
+<h2>To open it</h2>
+<ol>
+  <li>Plug the drive into a Windows computer (Windows 10 or 11).</li>
+  <li>Open the drive in File Explorer and double-click <b>Start</b> (the blue picture with a yellow book).</li>
+  <li>The Offline Library window opens in a few seconds. The books are ready after about half a minute.
+      The AI needs longer, a minute or more, and several minutes on older computers. You can read and use the maps meanwhile.</li>
+</ol>
+<p class="key">If you double-click Start while the library is already open, the open window comes to the front.</p>
+
+<h2>The buttons at the top</h2>
+<ul>
+  <li><b>Home</b>: the start page.</li>
+  <li><b>Back</b> and <b>Forward</b> (the arrows): the page you were on before, and back again.</li>
+  <li><b>Library</b>: all the books, and a box to <b>Search all books</b> at once.</li>
+  <li><b>Maps</b>: the street maps on this drive.</li>
+  <li><b>Ask</b>: ask the AI a question.</li>
+  <li><b>Help</b>: this guide.</li>
+  <li><b>Shut down</b>: closes everything. See “To finish” below.</li>
+</ul>
+<p>A small light next to the buttons shows whether the AI is starting, ready, or not available. Point at it to see why.</p>
+
+<h2>Library</h2>
+<ul>
+  <li>Click a book to open it. Each book has its own search box at the top.</li>
+  <li>To look in every book at once, use <b>Search all books</b> on the Library page.
+      The first search can take a few seconds; later searches are quicker.</li>
+  <li>Some books contain guides you can print, and videos you can play.</li>
+</ul>
+
+<h2>Maps</h2>
+<ul>
+  <li>Click a map to open it. Drag to move. Use the mouse wheel, or the + and − buttons, to zoom.</li>
+  <li>Use the map's search box to find a town or street.</li>
+  <li>Some very old computers cannot draw the maps. The Maps page then says so. The Library and the AI still work.</li>
+</ul>
+
+<h2>Ask the AI</h2>
+<ul>
+  <li>Click <b>Ask</b>, type a question in plain words, and press Enter. For example: <i>how do I purify water?</i></li>
+  <li>The AI searches the books, then writes an answer. A full answer can take one or two minutes.</li>
+  <li>Each answer lists its sources as numbers. Click a source to read the article it came from.</li>
+  <li>You can ask a follow-up question. <b>New question</b> starts again. <b>Stop</b> stops a long answer.</li>
+  <li>If the books do not cover your question, the AI says so.</li>
+</ul>
+<p class="key"><b>The AI can make mistakes. It is not a doctor.</b> For anything about health or safety,
+read the sources it shows, and get professional help whenever you can.</p>
+
+<h2>Bigger or smaller text</h2>
+<p>Hold <kbd>Ctrl</kbd> and press <kbd>+</kbd> for bigger text, <kbd>Ctrl</kbd> and <kbd>−</kbd> for smaller,
+<kbd>Ctrl</kbd> and <kbd>0</kbd> to go back to normal.</p>
+
+<h2>To finish</h2>
+<ol>
+  <li>Click <b>Shut down</b>, then <b>Yes</b>. Or close the window with the X in its corner.</li>
+  <li>Wait until the window has closed.</li>
+  <li>Remove the drive safely: click the drive picture near the clock, choose <b>Eject</b>, then unplug it.</li>
+</ol>
+
+<h2>If something goes wrong</h2>
+<ul>
+  <li><b>Nothing happens when you double-click Start:</b> wait 15 seconds; slow drives take longer.
+      Then double-click it once more.</li>
+  <li><b>“Windows protected your PC”:</b> click <b>More info</b>, then <b>Run anyway</b>.</li>
+  <li><b>Your antivirus program blocks or removes Start:</b> this is a false alarm; the program on this drive does
+      not use the internet. Choose to allow or restore it in your antivirus program, or contact the person who gave you this drive.</li>
+  <li><b>The AI is not available:</b> the light and the Ask page say why. The most common reason is a computer with
+      less than 6 GB of memory. The Library and Maps still work.</li>
+  <li><b>Everything is slow:</b> plug the drive into a faster port. On many computers the faster ports are blue inside, or marked “SS”.</li>
+  <li><b>The drive was unplugged while in use:</b> plug it back in, close the window, and double-click Start again.</li>
+  <li><b>A message says files are missing or the drive may be damaged:</b> contact the person who gave you this drive.</li>
+</ul>
+
+<h2>Good to know</h2>
+<ul>
+  <li>Private: nothing you read or ask leaves your computer, and your questions are not saved.</li>
+  <li>Keep a second copy of this drive somewhere safe. Any drive can fail.</li>
+</ul>
+
+<h2>Credits</h2>
+<p class="small">The books and maps come from open projects and keep their own licences.
+Wikipedia articles are by Wikipedia contributors, under the Creative Commons Attribution-ShareAlike licence.
+Map data © OpenStreetMap contributors, under the Open Database License.
+The library is served by Kiwix (GNU General Public License version 3).
+The AI runs on llama.cpp (MIT licence) and uses Llama 3.2, licensed under the Llama 3.2 Community License,
+© Meta Platforms, Inc. Built with Llama.
+The window uses Electron and Chromium (MIT and BSD-style licences).</p>
+</body>
+</html>
