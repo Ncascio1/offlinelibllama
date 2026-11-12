@@ -101,12 +101,12 @@ Books: 9 (Wikipedia nopic 52.7 GB, WikiMed, Appropedia, iFixit, military medicin
 
 | Step | Result |
 |---|---|
-| 1. Starts | PASS: window after 0.26 to 0.44 s. Library and Maps work (US map drawn in 2.8 s). No console window: *owner to confirm visually* |
+| 1. Starts | PASS: window after 0.26 to 0.44 s. Library and Maps work (US map drawn in 2.8 s). No console window (owner confirmed) |
 | 2. Full Wikipedia | Library ready after 7.4 to 9.4 s with all 9 books. Search: see problems below |
 | 3. AI | AI ready after 44 s (first start), 6 s (second start). Answers grounded with correct sources; "2030 World Cup" correctly not covered. Slow, see below |
-| 4. Clean shutdown | PASS for "End task" on the app: Windows stopped Kiwix and the AI by itself (the "job" safety net). Next start's leftover check behaved correctly. Shut down button and closing the window: *owner to check* |
+| 4. Clean shutdown | PASS for "End task" on the app: Windows stopped Kiwix and the AI by itself (the "job" safety net). Next start's leftover check behaved correctly. PASS for the Shut down button and for closing the window with X: both engines stopped within 0.5 s, nothing left running |
 | 5. No writes outside the drive | PASS: nothing new in %APPDATA% or %LOCALAPPDATA% |
-| 6. Firewall | PASS: no firewall rules created for our programs (no prompt) |
+| 6. Firewall | PASS: no firewall prompt (owner confirmed); no firewall rules created for our programs |
 | 7. Antivirus | PASS: Windows Defender custom scan of `_system` found nothing |
 | 8. Whole app on USB stick | Not done yet (see "What I need from you") |
 
