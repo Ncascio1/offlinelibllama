@@ -59,6 +59,9 @@ class AiService {
       '--api-key', this.apiKey,
     ];
     if (this.config.aiThreads) args.push('-t', String(this.config.aiThreads));
+    // Read the model file in one go (much faster from a USB stick, see config.js).
+    // Older llama.cpp builds called this --no-mmap; b12239 uses --load-mode.
+    if (this.config.aiLoadMode) args.push('--load-mode', this.config.aiLoadMode);
 
     this.setStatus('starting', messages.ai.starting);
     this.engine = new EngineProcess('ai', this.exe, args, this.log);

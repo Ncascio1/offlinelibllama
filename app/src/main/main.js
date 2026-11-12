@@ -252,16 +252,19 @@ async function startEngines() {
   catch (e) { log.error('no free ports', e); return setLibrary('failed', messages.library.couldNotStart); }
   const config = loadConfig(paths.configFile, log);
 
-  // The AI starts in parallel with the library and never blocks it.
+  // Start order (measured on the owner's USB stick, see docs/progress.md):
+  // 1. the library, 2. the AI once the library is up, 3. the search warm-up once
+  // the AI has finished loading. Run at the same time, all three read the stick
+  // together and each takes several times longer (library 65 s, AI 2 min 39 s).
   ai = new AiService({ exe: paths.llamaExe, modelsDir: paths.models, port: ports[1], config, log,
     onStatus: s => { state.ai = { state: s.state, message: s.message }; savePids(); broadcast(); } });
   if (zims.length === 0) {
     ai.setStatus('off', messages.ai.noBooks);
     return setLibrary('no-books', messages.library.noBooks);
   }
-  ai.start().catch(e => log.error('AI start crashed', e));
 
   kiwix = new KiwixService({ exe: paths.kiwixExe, port: ports[0], zims, log, startSeconds: config.kiwixStartSeconds });
+  let libraryReady = false;
   try {
     const books = await kiwix.start();
     savePids();
@@ -269,7 +272,7 @@ async function startEngines() {
     retriever = new KiwixRetriever({ baseUrl: kiwix.baseUrl, books, log });
     log.info(`library ready after ${Date.now() - START_TIME} ms`);
     broadcast();
-    kiwix.warmUp().catch(() => {}); // background head start for the first search
+    libraryReady = true;
     kiwix.engine.onceExit(info => {
       if (info.expected || shuttingDown) return;
       setLibrary('failed', messages.library.stopped);
@@ -281,6 +284,13 @@ async function startEngines() {
       || messages.library.couldNotStart;
     setLibrary('failed', msg);
   }
+
+  if (shuttingDown) return;
+  // The AI starts even if the library failed (its status light then explains itself).
+  // ai.start() never throws and returns once the AI is ready, off or failed.
+  await ai.start().catch(e => log.error('AI start crashed', e));
+  log.info(`AI start finished after ${Date.now() - START_TIME} ms (${ai.status.state})`);
+  if (libraryReady && !shuttingDown) kiwix.warmUp().catch(() => {}); // background head start for the first search
 }
 
 function setLibrary(st, message) { state.library = { state: st, message, books: [] }; broadcast(); }

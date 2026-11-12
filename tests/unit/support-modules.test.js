@@ -30,6 +30,14 @@ test('config: valid values are used, silly ones ignored', () => {
   assert.strictEqual(loadConfig(f, quietLog).forceTier, null);
   assert.strictEqual(loadConfig(f, quietLog).contextSize, null);
 });
+test('config: AI file reading defaults to one go ("none"); only known modes accepted', () => {
+  assert.strictEqual(DEFAULTS.aiLoadMode, 'none');
+  const f = path.join(tmp(), 'config.json');
+  fs.writeFileSync(f, JSON.stringify({ aiLoadMode: 'mmap' }));
+  assert.strictEqual(loadConfig(f, quietLog).aiLoadMode, 'mmap');
+  fs.writeFileSync(f, JSON.stringify({ aiLoadMode: '--evil' }));
+  assert.strictEqual(loadConfig(f, quietLog).aiLoadMode, 'none');
+});
 
 // ---- crash leftovers ----
 test('stale engines: only our own engine files are stopped; file is removed afterwards', async () => {

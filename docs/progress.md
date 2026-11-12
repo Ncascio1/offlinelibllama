@@ -122,17 +122,39 @@ First start from the new layout, close to a real first plug-in: window 0.47 s, *
 2 min 39 s**, warm-up finished after 99 s; search worked, closing left nothing running. The warm-up and the AI
 both read from the stick during startup and slow each other down; worth tuning (for example: warm up only after
 the AI is ready, or start the AI a few seconds after the library).
-### Next: speed up startup (in progress, 2026-11-12)
-Facts so far: the owner's stick reads about **145 MB/s** for one big file and about **900 small (64 KB) reads per
-second** (one reader, data never read before). So the 2 GB AI file alone should load in roughly 15 s, yet in the
-real start the AI took 2 min 39 s and the library 65 s, while Kiwix, the AI and the warm-up all read the stick at once.
-The stick could not be ejected for a true cold test because the Claude session had been started inside `D:\Proj`.
-Plan for the next session (started in `C:\Users\nicho\OfflineLibrary-dev\offlinelibllama`, stick freshly replugged):
-1. Cold-measure each engine alone: `tests\manual\cold-start-measure.ps1 -Drive D:` (Kiwix, then the AI);
-   replug, then `-SkipKiwix -LlamaExtra '--no-mmap'` to compare the two ways the AI can load its file.
-2. Change the start order in `app/src/main/main.js`: Library first, AI once the library is ready, warm-up only
-   after the AI is ready (or paused while it loads). Use `--no-mmap` if step 1 shows it is faster.
-3. Replug, then a cold start of the whole app from the stick; compare with 65 s / 2 min 39 s.
+### Startup sped up (done, 2026-11-12)
+The owner's stick reads about **145 MB/s** for one big file and about **900 small (64 KB) reads per second**.
+Measured with the stick freshly replugged each time (`tests\manual\cold-start-measure.ps1`):
+
+| Engine alone, cold stick | Time |
+|---|---|
+| Library (Kiwix, 9 books) | ready 8.0 s; first Wikipedia search 3.2 s |
+| AI, llama.cpp's default file reading ("mmap", small pieces on demand) | ready 61.6 s, 3.0 GB memory |
+| AI, reading the file in one go (`--load-mode none`) | **ready 18.3 s**, 2.4 GB memory |
+
+Note: this llama.cpp version (b12239) no longer knows `--no-mmap`; it quits at once. The new name is `--load-mode`.
+
+Changes:
+1. The AI now reads its file in one go (`--load-mode none`). Owner override in `config.json`: `"aiLoadMode"`
+   (`none`, `mmap`, `dio`, `auto`).
+2. Start order: library first, the AI once the library is up, the search warm-up once the AI has loaded.
+   Before, all three read the stick at the same time and slowed each other down.
+
+Whole app, cold stick, before → after:
+
+| Step | Before | After |
+|---|---|---|
+| Window shown | 0.47 s | 0.30 s |
+| Library ready | 65 s | **13.7 s** |
+| AI ready | 2 min 39 s | **51 s** |
+| Search warm-up done | 99 s | 83 s |
+
+Then one real question ("How do I purify water by boiling?"): correct answer with 2 sources and the safety
+note, 82 s in total (searching 35 s, right after the warm-up; reading 25 s; writing 22 s). Closing the window
+left nothing running. Unit tests: 73 of 73 pass (1 new).
+Open questions: the AI took 37 s after the library was ready, against 18 s alone, so Kiwix still reads the stick
+for a while after it answers; the first search right after startup is still slow (35 s). Ideas for later: show
+search results book by book as they arrive; measure `--load-mode dio`.
 
 Still missing for customers: `Start.exe` at the top level (today they would have to open
 `_system\app\OfflineLibrary.exe`). It needs a C compiler to build from `spikes/launcher/start.c` (Phase 5).
