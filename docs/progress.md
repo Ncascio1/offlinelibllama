@@ -108,7 +108,10 @@ Books: 9 (Wikipedia nopic 52.7 GB, WikiMed, Appropedia, iFixit, military medicin
 | 5. No writes outside the drive | PASS: nothing new in %APPDATA% or %LOCALAPPDATA% |
 | 6. Firewall | PASS: no firewall prompt (owner confirmed); no firewall rules created for our programs |
 | 7. Antivirus | PASS: Windows Defender custom scan of `_system` found nothing |
-| 8. Whole app on USB stick | Not done yet (see "What I need from you") |
+| 8. Whole app on USB stick | PASS. Everything on the owner's USB stick (D:, exFAT, folder `D:\Proj` as the drive root): window 0.97 s, AI ready 25 s, library ready 34.5 s (both loading from the same stick at once, so slower than from C:). Search and AI work; AI answers 19 to 30 s (first words after about 13 s, PC less busy). Closing the window: nothing left running. **Different drive letter:** the same folder as a temporary `X:` drive (Windows `subst`, books at `X:\library`): starts, finds everything at `X:\`, searches, closes cleanly |
+
+Owner confirmed by eye: no black console window and no firewall prompt at any time.
+Not tested: a write-protected drive, a slow USB 2 stick, unplugging while running, other PCs (4 and 8 GB, Windows 10).
 
 ### Problems found on Windows, and what was done
 1. **App crash when asking the AI (fixed).** "A JavaScript error occurred in the main process ... assert(!this.paused)".
